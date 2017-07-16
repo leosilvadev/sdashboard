@@ -1,4 +1,4 @@
-package com.github.leosilvadev.sdashboard.configuration.domains
+package com.github.leosilvadev.sdashboard.dashboard.domains
 
 import com.github.leosilvadev.sdashboard.component.domains.Component
 import io.vertx.lang.scala.json.JsonObject

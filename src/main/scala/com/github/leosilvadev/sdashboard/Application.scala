@@ -1,8 +1,7 @@
 package com.github.leosilvadev.sdashboard
 
-import com.github.leosilvadev.sdashboard.component.service.ComponentChecker
+import com.github.leosilvadev.sdashboard.dashboard.domains.{Configuration, Dashboard}
 import io.vertx.scala.core.Vertx
-import com.github.leosilvadev.sdashboard.configuration.domains.Configuration
 
 /**
   * Created by leonardo on 7/11/17.
@@ -17,13 +16,8 @@ object Application extends App {
 
   val config = Configuration(json)
 
-  val obs = config.components.flatMap(component => {
-    Map(component.name -> ComponentChecker(vertx, component).start)
+  Dashboard(vertx, config).start().subscribe(status => {
+    println(status)
   })
 
-  obs.foreach(c => {
-    c._2.subscribe(result => println(s"${c._1}: ${result}"))
-  })
-
-  println(config)
 }

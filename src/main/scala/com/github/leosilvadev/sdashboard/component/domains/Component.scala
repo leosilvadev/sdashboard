@@ -8,19 +8,19 @@ import io.vertx.lang.scala.json.JsonObject
   */
 case class Component(name: String, tasks: List[Task] = List.empty, status: Status = Status.Active()) {
 
-  def addTask(task: Task): Component = Component(name, task :: tasks, status)
+  def addTask(json: JsonObject): Component = Component(name, HttpTask(this, json) :: tasks, status)
 
 }
 
 object Component {
 
   def apply(json: JsonObject): Component = {
+    var component = Component(json.getString("name"))
     val tasksJson = json.getJsonArray("tasks")
-    var tasks = List[Task]()
     tasksJson.forEach(json => {
-      tasks = HttpTask(json.asInstanceOf[JsonObject]) :: tasks
+      component = component.addTask(json.asInstanceOf[JsonObject])
     })
-    Component(json.getString("name"), tasks)
+    component
   }
 
 }
