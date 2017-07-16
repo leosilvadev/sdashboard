@@ -1,0 +1,13 @@
+{
+  "components": [{
+    "name": "app1",
+    "tasks": [{
+      "type": "http",
+      "frequency": 2000,
+      "url": "http://localhost:8000/status",
+      "headers": {
+        "Authorization": "q1w2e3"
+      }
+    }]
+  }]
+}

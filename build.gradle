@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'scala'
+}
+
+group 'com.github.leosilvadev'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'io.vertx:vertx-web-scala_2.12:3.4.2'
+    compile 'io.vertx:vertx-mongo-client-scala_2.12:3.4.2'
+    compile 'io.vertx:vertx-web-client-scala_2.12:3.4.2'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.1'
+
+    compile 'org.scala-lang:scala-library:2.12.2'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
