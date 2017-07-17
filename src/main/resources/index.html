@@ -2,9 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+<script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+<script>
+var sock = new SockJS('http://localhost:8080/dashboard');
+
+sock.onopen = function() {
+  console.log('open');
+};
+
+sock.onmessage = function(e) {
+  console.log('message', e.data);
+};
+
+sock.onclose = function() {
+  console.log('close');
+};
+
+
+</script>
 </body>
 </html>
