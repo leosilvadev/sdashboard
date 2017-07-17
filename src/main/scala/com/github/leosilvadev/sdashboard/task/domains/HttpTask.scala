@@ -29,7 +29,7 @@ case class HttpTask(component: Component, url: String, frequency: Long, headers:
             emitter.onNext(Status.Offline(component, ResponseException(result)))
 
           case Failure(ex) =>
-            emitter.onNext(Status.Offline(component, ex))
+            emitter.onNext(Status.Offline(component, ResponseException(ex)))
         }
       })
     })

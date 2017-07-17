@@ -1,7 +1,9 @@
 package com.github.leosilvadev.sdashboard
 
-import com.github.leosilvadev.sdashboard.dashboard.domains.{Configuration, Dashboard}
-import io.vertx.scala.core.Vertx
+import com.github.leosilvadev.sdashboard.dashboard.DashboardServer
+import io.vertx.lang.scala.ScalaVerticle
+import io.vertx.lang.scala.json.Json
+import io.vertx.scala.core.{DeploymentOptions, Vertx}
 
 /**
   * Created by leonardo on 7/11/17.
@@ -12,12 +14,10 @@ object Application extends App {
 
   val vertx = Vertx.vertx()
 
-  val json = vertx.fileSystem().readFileBlocking(configFile).toJsonObject
+  val deploymentOptions = DeploymentOptions().setConfig(Json.obj(("configFile", configFile)))
 
-  val config = Configuration(json)
-
-  Dashboard(vertx, config).start().subscribe(status => {
-    println(status)
+  vertx.deployVerticle(ScalaVerticle.nameForVerticle[DashboardServer], deploymentOptions, result => {
+    println(result.succeeded())
   })
 
 }
