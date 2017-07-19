@@ -1,22 +1,46 @@
 package com.github.leosilvadev.sdashboard.component.domains
 
+import java.util.UUID
+
 import com.github.leosilvadev.sdashboard.task.domains.{HttpTask, Task}
-import io.vertx.lang.scala.json.JsonObject
+import io.vertx.lang.scala.json.{Json, JsonObject}
+
+import scala.collection.mutable
 
 /**
   * Created by leonardo on 7/9/17.
   */
-case class Component(name: String, tasks: List[Task] = List.empty, status: Status = Status.Active()) {
+case class Component(id: String, name: String, tasks: List[Task] = List.empty, status: Status = Status.Active()) {
 
-  def addTask(json: JsonObject): Component = Component(name, HttpTask(this, json) :: tasks, status)
+  def addTask(json: JsonObject): Component = Component(id, name, HttpTask(this, json) :: tasks, status)
+
+  def withId(id: String): Component = {
+    Component(id, name, tasks, status)
+  }
+
+  def toJson: JsonObject = {
+    Json.obj(("_id", id), ("name", name), ("tasks", tasks.map(_.toJson)))
+  }
+
+  def invalid: List[String] = {
+    val fields = mutable.MutableList[String]()
+
+    if (name.isEmpty)
+      fields += "name"
+
+    if (tasks.isEmpty)
+      fields += "tasks"
+
+    fields.toList
+  }
 
 }
 
 object Component {
 
   def apply(json: JsonObject): Component = {
-    var component = Component(json.getString("name"))
-    val tasksJson = json.getJsonArray("tasks")
+    var component = Component(json.getString("_id", UUID.randomUUID().toString), json.getString("name"))
+    val tasksJson = json.getJsonArray("tasks", Json.emptyArr())
     tasksJson.forEach(json => {
       component = component.addTask(json.asInstanceOf[JsonObject])
     })

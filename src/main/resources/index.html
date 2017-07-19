@@ -7,7 +7,7 @@
 <body>
 <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
 <script>
-var sock = new SockJS('http://localhost:8080/dashboard');
+var sock = new SockJS('http://localhost:8080/ws/dashboard');
 
 sock.onopen = function() {
   console.log('open');

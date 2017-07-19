@@ -19,20 +19,20 @@ object Status {
   case class Online(comp: Component, response: JsonObject) extends Status {
     override def component: Option[Component] = Some(comp)
 
-    override def toJson: JsonObject = Json.obj((comp.name, "online"), ("metadata", response))
+    override def toJson: JsonObject = Json.obj(("type", "online"), (comp.name, "online"), ("metadata", response))
   }
 
   case class Offline(comp: Component, ex: ResponseException) extends Status {
     override def component: Option[Component] = Some(comp)
 
-    override def toJson: JsonObject = Json.obj((comp.name, "offline"), ("error", ex.message()))
+    override def toJson: JsonObject = Json.obj(("type", "offline"), (comp.name, "offline"), ("error", ex.message()))
   }
 
   case class Active() extends Status {
 
     override def component: Option[Component] = None
 
-    override def toJson: JsonObject = Json.emptyObj()
+    override def toJson: JsonObject = Json.obj(("type", "active"))
 
   }
 

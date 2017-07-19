@@ -1,9 +1,15 @@
 package com.github.leosilvadev.sdashboard.dashboard
 
-import com.github.leosilvadev.sdashboard.dashboard.domains.{Configuration, Dashboard}
+import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
+import com.github.leosilvadev.sdashboard.component.service.ComponentRepository
+import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.lang.scala.ScalaVerticle
+import io.vertx.lang.scala.json.{Json, JsonObject}
+import io.vertx.scala.core.eventbus.Message
+import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.Router
+import io.vertx.scala.ext.web.handler.BodyHandler
 import io.vertx.scala.ext.web.handler.sockjs.{SockJSHandler, SockJSHandlerOptions, SockJSSocket}
 
 import scala.concurrent.Future
@@ -18,23 +24,27 @@ case class DashboardServer() extends ScalaVerticle {
 
   override def startFuture(): Future[_] = {
     try {
-      val configFile = config.getString("configFile")
-      val json = vertx.fileSystem().readFileBlocking(configFile).toJsonObject
-      val dashboardPublisher = Dashboard(vertx, Configuration(json)).start().publish()
-      dashboardPublisher.connect()
-
       val router = Router.router(vertx)
       val options = SockJSHandlerOptions().setHeartbeatInterval(2000)
       val handler = SockJSHandler.create(vertx, options)
 
       handler.socketHandler((socket: SockJSSocket) => {
         logger.info("New client connected, {}", socket.writeHandlerID())
-        dashboardPublisher.subscribe(status => {
-          socket.write(status.toJson.toBuffer)
+        vertx.eventBus().consumer("components.status.update", (message: Message[JsonObject]) => {
+          val status = message.body()
+          socket.write(status.encode())
         })
       })
 
-      router.route("/dashboard/*").handler(handler)
+      val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", "sdashboard")))
+      val componentRepository = ComponentRepository(mongoClient)
+      val dashboard = Dashboard(vertx)
+
+      router.post().handler(BodyHandler.create())
+      router.get("/api/v1/components").handler(ComponentListHandler(componentRepository))
+      router.post("/api/v1/components").handler(ComponentRegisterHandler(componentRepository, dashboard))
+      router.delete("/api/v1/components/:id").handler(ComponentUnregisterHandler(componentRepository, dashboard))
+      router.route("/ws/dashboard/*").handler(handler)
 
       val server = vertx.createHttpServer()
       server.requestHandler(router.accept _)

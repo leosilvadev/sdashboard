@@ -49,7 +49,7 @@ object HttpTask {
 
   def apply(component: Component, json: JsonObject): HttpTask = {
     var task = new HttpTask(component, json.getString("url"), json.getLong("frequency"))
-    json.getJsonObject("headers").forEach(entry => {
+    json.getJsonObject("headers", Json.emptyObj()).forEach(entry => {
       task = task.addHeader(entry.getKey, entry.getValue.toString)
     })
     task
