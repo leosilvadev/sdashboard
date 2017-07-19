@@ -11,7 +11,6 @@ import io.vertx.scala.core.Vertx
 object Application extends App {
 
   val logger = Logger(classOf[App])
-  val configFile = if (args.isEmpty) "config.json" else args(0)
   val vertx = Vertx.vertx()
 
   vertx.deployVerticle(ScalaVerticle.nameForVerticle[DashboardServer], result => {
