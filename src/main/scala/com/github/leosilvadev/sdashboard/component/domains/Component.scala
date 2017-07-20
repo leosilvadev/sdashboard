@@ -47,4 +47,6 @@ object Component {
     component
   }
 
+  def apply(id: String, name: String): Component = new Component(id, name)
+
 }

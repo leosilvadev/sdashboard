@@ -50,7 +50,7 @@ case class DashboardServer() extends ScalaVerticle {
       server.requestHandler(router.accept _)
 
       server.listen(8080)
-      Future.successful()
+      Future.successful(server)
 
     } catch {
       case ex: Exception => Future.failed(ex)

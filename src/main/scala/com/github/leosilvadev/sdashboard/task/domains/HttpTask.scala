@@ -8,6 +8,7 @@ import io.vertx.lang.scala.json.{Json, JsonObject}
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.ext.web.client.WebClient
 
+import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
@@ -40,7 +41,7 @@ case class HttpTask(component: Component, url: String, frequency: Long, headers:
   }
 
   def toJson: JsonObject = {
-    Json.obj(("url", url), ("frequency", frequency), ("headers", JsonObject.mapFrom(headers)))
+    Json.obj(("url", url), ("frequency", frequency), ("headers", JsonObject.mapFrom(headers.asJava)))
   }
 
 }
@@ -54,5 +55,7 @@ object HttpTask {
     })
     task
   }
+
+  def apply(component: Component, url: String, frequency: Long): HttpTask = new HttpTask(component, url, frequency)
 
 }
