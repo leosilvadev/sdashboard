@@ -6,6 +6,7 @@ import com.github.leosilvadev.sdashboard.component.domains.Status.Offline
 import com.github.leosilvadev.sdashboard.component.domains.{Component, Status}
 import com.github.leosilvadev.sdashboard.component.service.ComponentChecker
 import com.github.leosilvadev.sdashboard.task.exceptions.ResponseException
+import com.typesafe.scalalogging.Logger
 import io.reactivex.disposables.Disposable
 import io.vertx.scala.core.Vertx
 
@@ -14,7 +15,14 @@ import io.vertx.scala.core.Vertx
   */
 case class Dashboard(vertx: Vertx) {
 
+  val logger = Logger(classOf[Dashboard])
   val components = new ConcurrentHashMap[String, Disposable]()
+
+  def reloadComponents(newComponents: List[Component]): Unit = {
+    components.clear()
+    newComponents.foreach(register(_))
+    logger.info("Components reloaded: {}", newComponents)
+  }
 
   def register(component: Component): Unit = {
     val obs = ComponentChecker(vertx, component).start

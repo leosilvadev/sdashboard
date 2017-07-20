@@ -40,6 +40,8 @@ case class DashboardServer() extends ScalaVerticle {
       val componentRepository = ComponentRepository(mongoClient)
       val dashboard = Dashboard(vertx)
 
+      componentRepository.list().subscribe(dashboard.reloadComponents(_), ex => logger.error(ex.getMessage, ex))
+
       router.post().handler(BodyHandler.create())
       router.get("/api/v1/components").handler(ComponentListHandler(componentRepository))
       router.post("/api/v1/components").handler(ComponentRegisterHandler(componentRepository, dashboard))
