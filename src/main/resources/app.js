@@ -1,16 +1,6 @@
 import React from 'react';
-import SockJS from 'sockjs-client';
+import ReactDOM from 'react-dom';
+import Components from './components/components';
+import socket from './ws/socket';
 
-const sock = new SockJS('http://localhost:8080/ws/dashboard');
-
-sock.onopen = function() {
-  console.log('open');
-};
-
-sock.onmessage = function(e) {
-  console.log('message', e.data);
-};
-
-sock.onclose = function() {
-  console.log('close');
-};
+ReactDOM.render(<Components />, document.getElementById('content'))

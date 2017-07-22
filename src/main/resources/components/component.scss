@@ -1,0 +1,9 @@
+.component {
+    padding: 10px;
+
+    &.offline:before {
+        content: ' \25CF';
+        font-size: 50px;
+        color: red;
+    }
+}
