@@ -1,6 +1,5 @@
 package com.github.leosilvadev.sdashboard.dashboard
 
-import com.github.leosilvadev.sdashboard.component.domains.Component
 import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
 import com.github.leosilvadev.sdashboard.component.service.ComponentRepository
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
