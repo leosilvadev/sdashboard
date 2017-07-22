@@ -12,7 +12,7 @@ case class Response(context: RoutingContext) {
   val logger = Logger(classOf[Response])
 
   def created(id: String): Unit = {
-    respond(201, Json.obj(("id", id)))
+    respond(201, Json.obj(("_id", id)))
   }
 
   def created(json: JsonObject = Json.emptyObj()): Unit = {

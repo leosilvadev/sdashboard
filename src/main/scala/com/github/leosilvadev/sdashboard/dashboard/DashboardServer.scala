@@ -1,5 +1,6 @@
 package com.github.leosilvadev.sdashboard.dashboard
 
+import com.github.leosilvadev.sdashboard.component.domains.Component
 import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
 import com.github.leosilvadev.sdashboard.component.service.ComponentRepository
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
@@ -9,7 +10,7 @@ import io.vertx.lang.scala.json.{Json, JsonObject}
 import io.vertx.scala.core.eventbus.Message
 import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.Router
-import io.vertx.scala.ext.web.handler.BodyHandler
+import io.vertx.scala.ext.web.handler.{BodyHandler, CorsHandler}
 import io.vertx.scala.ext.web.handler.sockjs.{SockJSHandler, SockJSHandlerOptions, SockJSSocket}
 
 import scala.concurrent.Future
@@ -28,20 +29,13 @@ case class DashboardServer() extends ScalaVerticle {
       val options = SockJSHandlerOptions().setHeartbeatInterval(2000)
       val handler = SockJSHandler.create(vertx, options)
 
-      handler.socketHandler((socket: SockJSSocket) => {
-        logger.info("New client connected, {}", socket.writeHandlerID())
-        vertx.eventBus().consumer("components.status.update", (message: Message[JsonObject]) => {
-          val status = message.body()
-          socket.write(status.encode())
-        })
-      })
-
       val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", "sdashboard")))
       val componentRepository = ComponentRepository(mongoClient)
       val dashboard = Dashboard(vertx)
 
       componentRepository.list().subscribe(dashboard.reloadComponents(_), ex => logger.error(ex.getMessage, ex))
 
+      router.route().handler(CorsHandler.create("*").allowedHeader("Content-Type"))
       router.post().handler(BodyHandler.create())
       router.get("/api/v1/components").handler(ComponentListHandler(componentRepository))
       router.post("/api/v1/components").handler(ComponentRegisterHandler(componentRepository, dashboard))
@@ -52,6 +46,15 @@ case class DashboardServer() extends ScalaVerticle {
       server.requestHandler(router.accept _)
 
       server.listen(8080)
+
+      handler.socketHandler((socket: SockJSSocket) => {
+        logger.info("New client connected, {}", socket.writeHandlerID())
+        vertx.eventBus().consumer("components.status.update", (message: Message[JsonObject]) => {
+          val status = message.body()
+          socket.write(status.encode())
+        })
+      })
+
       Future.successful(server)
 
     } catch {

@@ -1,5 +1,7 @@
 package com.github.leosilvadev.sdashboard.component.domains
 
+import java.time.Instant
+
 import com.github.leosilvadev.sdashboard.task.exceptions.ResponseException
 import io.vertx.lang.scala.json.{Json, JsonObject}
 
@@ -19,13 +21,13 @@ object Status {
   case class Online(comp: Component, response: JsonObject) extends Status {
     override def component: Option[Component] = Some(comp)
 
-    override def toJson: JsonObject = Json.obj(("type", "online"), (comp.name, "online"), ("metadata", response))
+    override def toJson: JsonObject = Json.obj(("status", "online"), ("datetime", Instant.now().toString), ("component", comp.toJson), ("data", response))
   }
 
   case class Offline(comp: Component, ex: ResponseException) extends Status {
     override def component: Option[Component] = Some(comp)
 
-    override def toJson: JsonObject = Json.obj(("type", "offline"), (comp.name, "offline"), ("error", ex.message()))
+    override def toJson: JsonObject = Json.obj(("status", "offline"), ("datetime", Instant.now().toString), ("component", comp.toJson), ("error", ex.message()))
   }
 
   case class Active() extends Status {
