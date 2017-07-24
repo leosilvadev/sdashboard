@@ -26,11 +26,9 @@ class ComponentsStore extends EventEmitter {
     }
 
     registerComponent(component) {
-        console.log(component);
         axios.post('http://localhost:8080/api/v1/components', component)
           .then(response => {
-            component._id = response.data._id;
-            this.addComponent(component);
+            console.log(`Component ${component.name} registered successfully!`);
           })
           .catch(error => {
             console.log(error);
@@ -38,7 +36,7 @@ class ComponentsStore extends EventEmitter {
     }
 
     getComponents() {
-        return this.components;
+        return this.components.sort((c1, c2) => c1.name > c2.name);
     }
 
     action({type, payload}) {

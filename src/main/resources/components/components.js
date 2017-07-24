@@ -1,6 +1,6 @@
 import React from 'react';
 import Component from './component';
-import {registerComponent} from '../flux/actions/components';
+import ComponentsMenu from './componentsMenu';
 import componentsStore from '../flux/stores/components';
 
 export default class Components extends React.Component {
@@ -9,7 +9,6 @@ export default class Components extends React.Component {
         super(props);
 
         this.component = {};
-        this.register = this.register.bind(this);
         this.state = {
             components: componentsStore.getComponents()
         }
@@ -25,31 +24,14 @@ export default class Components extends React.Component {
         this.setState({components});
     }
 
-    register() {
-        const component = {
-            name: this.component.name.value,
-            tasks: [{
-                url: this.component.taskUrl.value,
-                frequency: parseInt(this.component.frequency.value)
-            }]
-        }
-        registerComponent(component);
-    }
-
     render() {
         const {components} = this.state;
         const data = components.map(component =>
-            <Component key={component._id} id={component._id} status={component.status}>
-                {component.name} - {component.datetime}
+            <Component key={component._id} component={component}>
             </Component>
         );
-        return  <div className="components_wrapper">
-                    <div className="components_header">
-                        <input id="componentName" ref={(name) => this.component.name = name} />
-                        <input id="componentTaskUrl" ref={(url) => this.component.taskUrl = url} />
-                        <input id="componentTaskFrequency" ref={(frequency) => this.component.frequency = frequency} type="number" />
-                        <button onClick={this.register}>Register</button>
-                    </div>
+        return  <div className="components_wrapper container">
+                    <ComponentsMenu />
                     <div className="components_body">
                         {data}
                     </div>

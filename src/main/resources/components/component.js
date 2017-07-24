@@ -1,10 +1,18 @@
 import React from 'react';
-require('./component.scss');
+import ComponentData from './componentData';
+
+import './component.scss';
 
 export default class Component extends React.Component {
 
     render() {
-        return <div id={this.props.id} className={'component ' + this.props.status}>{this.props.children}</div>
+        const component = this.props.component;
+        return  <div id={component.id} className={`panel component ${component.status}`}>
+                    <div className='panel-heading'>{component.name} - {component.status.toUpperCase()} - {component.datetime}</div>
+                    <div className="panel-body">
+                        <ComponentData data={component.data}/>
+                    </div>
+                </div>
     }
 
 }

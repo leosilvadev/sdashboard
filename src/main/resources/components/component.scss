@@ -1,9 +1,24 @@
 .component {
-    padding: 10px;
+    padding: 0px;
 
-    &.offline:before {
-        content: ' \25CF';
-        font-size: 50px;
-        color: red;
+    &.offline {
+        color: #333333;
+        border-color: #f92a2a;
+        .panel-heading {
+            background-color: #ff4343;
+        }
+    }
+
+    &.online {
+        color: #333333;
+        border-color: #57d404;
+        .panel-heading {
+            background-color: #aaffa5;
+        }
+    }
+
+    .panel-heading {
+        font-size: 1.2em;
+        font-weight: bold;
     }
 }
