@@ -18,13 +18,18 @@ import scala.util.{Failure, Success}
 case class HttpTask(component: Component, url: String, frequency: Long, headers: Map[String, String] = Map()) extends Task {
 
   def start(vertx: Vertx): Observable[Status] = {
-    val client = WebClient.create(vertx).get(url)
-    headers.foreach((header) => client.putHeader(header._1, header._2))
     Observable.create[Status](emitter => {
       vertx.setPeriodic(frequency, n => {
+        val client = WebClient.create(vertx).getAbs(url)
+        headers.foreach((header) => client.putHeader(header._1, header._2))
         client.sendFuture().onComplete {
           case Success(result) if result.statusCode() >= 200 && result.statusCode() < 400 =>
-            emitter.onNext(Status.Online(component, result.bodyAsJsonObject().getOrElse(Json.emptyObj())))
+            try {
+              val json = result.bodyAsJsonObject().getOrElse(Json.emptyObj())
+              emitter.onNext(Status.Online(component, json))
+            } catch {
+              case _ => emitter.onNext(Status.Offline(component, ResponseException(500, "Status endpoint returned a non-json response")))
+            }
 
           case Success(result) =>
             emitter.onNext(Status.Offline(component, ResponseException(result)))

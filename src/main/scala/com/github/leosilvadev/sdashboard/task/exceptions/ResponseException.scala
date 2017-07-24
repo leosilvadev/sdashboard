@@ -21,5 +21,5 @@ object ResponseException {
 
   def apply(response: HttpResponse[Buffer]): ResponseException =
     new ResponseException(response.statusCode(), response.bodyAsString("UTF-8").getOrElse("Empty response"))
-  
+
 }
