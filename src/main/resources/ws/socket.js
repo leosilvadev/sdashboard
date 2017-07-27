@@ -9,8 +9,8 @@ sock.onopen = function() {
 };
 
 sock.onmessage = function(e) {
-    const {component, status, datetime, data} = JSON.parse(e.data);
-    const comp = Object.assign({}, component, {status, datetime, data});
+    const {component, status, datetime, data, error} = JSON.parse(e.data);
+    const comp = Object.assign({}, component, {status, datetime, data, error});
     addComponent(comp);
 };
 

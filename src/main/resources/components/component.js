@@ -10,7 +10,7 @@ export default class Component extends React.Component {
         return  <div id={component.id} className={`panel component ${component.status}`}>
                     <div className='panel-heading'>{component.name} - {component.status.toUpperCase()} - {component.datetime}</div>
                     <div className="panel-body">
-                        <ComponentData data={component.data}/>
+                        <ComponentData data={component.data} error={component.error}/>
                     </div>
                 </div>
     }

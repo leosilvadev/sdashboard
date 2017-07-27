@@ -1,2 +1,8 @@
 .components_wrapper {
 }
+
+.component_registration {
+    &> a {
+        padding: 8px !important;
+    }
+}

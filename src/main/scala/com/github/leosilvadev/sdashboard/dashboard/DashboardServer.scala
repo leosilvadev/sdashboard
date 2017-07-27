@@ -3,7 +3,6 @@ package com.github.leosilvadev.sdashboard.dashboard
 import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
 import com.github.leosilvadev.sdashboard.component.service.ComponentRepository
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
-import com.github.leosilvadev.sdashboard.util.Response
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.{Json, JsonObject}
@@ -11,7 +10,7 @@ import io.vertx.scala.core.eventbus.Message
 import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.Router
 import io.vertx.scala.ext.web.handler.sockjs.{SockJSHandler, SockJSHandlerOptions, SockJSSocket}
-import io.vertx.scala.ext.web.handler.{BodyHandler, CorsHandler}
+import io.vertx.scala.ext.web.handler.{BodyHandler, CorsHandler, StaticHandler}
 
 import scala.concurrent.Future
 
@@ -34,6 +33,9 @@ case class DashboardServer() extends ScalaVerticle {
       val dashboard = Dashboard(vertx)
 
       componentRepository.list().subscribe(dashboard.reloadComponents(_), ex => logger.error(ex.getMessage, ex))
+
+      router.route("/").handler(StaticHandler.create("src/main/resources/").setIndexPage("index.html"))
+      router.route("/assets/*").handler(StaticHandler.create("src/main/resources/assets"))
 
       router.route().handler(CorsHandler.create("*").allowedHeader("Content-Type"))
       router.post().handler(BodyHandler.create())
