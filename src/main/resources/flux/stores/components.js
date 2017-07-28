@@ -26,7 +26,7 @@ class ComponentsStore extends EventEmitter {
     }
 
     registerComponent(component) {
-        axios.post('http://localhost:8080/api/v1/components', component)
+        axios.post('/api/v1/components', component)
           .then(response => {
             console.log(`Component ${component.name} registered successfully!`);
           })

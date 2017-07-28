@@ -1,13 +1,16 @@
 plugins {
     id 'java'
     id 'scala'
+    id 'application'
     id 'jacoco'
     id "org.scoverage" version "2.1.0"
+    id "com.moowork.node" version "1.2.0"
 }
 
 group 'com.github.leosilvadev'
 version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
+mainClassName = "com.github.leosilvadev.sdashboard.Application"
 
 repositories {
     mavenCentral()
@@ -35,4 +38,14 @@ jacocoTestReport {
     }
 }
 
+task installFrontEnd(type: NpmTask) {
+    args = ['install', '--prefix', 'src/main/resources']
+}
+
+task buildFrontEnd(type: NpmTask, dependsOn: installFrontEnd) {
+    args = ['run', 'build']
+}
+
+
+installDist.dependsOn buildFrontEnd
 check.dependsOn jacocoTestReport

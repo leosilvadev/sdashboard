@@ -28,7 +28,7 @@ case class HttpTask(component: Component, url: String, frequency: Long, headers:
               val json = result.bodyAsJsonObject().getOrElse(Json.emptyObj())
               emitter.onNext(Status.Online(component, json))
             } catch {
-              case _ => emitter.onNext(Status.Offline(component, ResponseException(500, "Status endpoint returned a non-json response")))
+              case _: Exception => emitter.onNext(Status.Offline(component, ResponseException(500, "Status endpoint returned a non-json response")))
             }
 
           case Success(result) =>

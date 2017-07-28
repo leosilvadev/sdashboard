@@ -45,11 +45,11 @@ export default class Components extends React.Component {
                 <Navbar>
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <a href="#">React-Bootstrap</a>
+                            <a href="#">SDashboard</a>
                         </Navbar.Brand>
                     </Navbar.Header>
                     <Nav>
-                        <NavItem eventKey={1} href="#">Link</NavItem>
+                        <NavItem eventKey={1} href="#">Dashboard</NavItem>
                         <NavItem eventKey={2} className="component_registration">
                             <ComponentRegistration></ComponentRegistration>
                         </NavItem>

@@ -57,7 +57,7 @@ export default class ComponentRegistration extends React.Component {
 
         <Modal show={this.state.show} onHide={this.close}>
             <Form onSubmit={this.register} onValid={this.enableButton} onInvalid={this.disableButton} className="login">
-                        <Modal.Header closeButton>
+                <Modal.Header closeButton>
                     <Modal.Title>New component</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

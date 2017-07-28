@@ -24,6 +24,7 @@ case class DashboardServer() extends ScalaVerticle {
 
   override def startFuture(): Future[_] = {
     try {
+      val port = config.getInteger("port", 8080)
       val router = Router.router(vertx)
       val options = SockJSHandlerOptions().setHeartbeatInterval(2000)
       val handler = SockJSHandler.create(vertx, options)
@@ -47,7 +48,7 @@ case class DashboardServer() extends ScalaVerticle {
       val server = vertx.createHttpServer()
       server.requestHandler(router.accept _)
 
-      server.listen(8080)
+      server.listen(port)
 
       handler.socketHandler((socket: SockJSSocket) => {
         logger.info("New client connected, {}", socket.writeHandlerID())
