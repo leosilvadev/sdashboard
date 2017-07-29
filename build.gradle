@@ -9,11 +9,19 @@ plugins {
 
 group 'com.github.leosilvadev'
 version '1.0-SNAPSHOT'
+
 sourceCompatibility = 1.8
 mainClassName = "com.github.leosilvadev.sdashboard.Application"
 
 repositories {
     mavenCentral()
+}
+
+node {
+    download = false
+    workDir = file("${project.buildDir}/nodejs")
+    npmWorkDir = file("${project.buildDir}/npm")
+    nodeModulesDir = file("${project.projectDir}/src/main/resources/node_modules")
 }
 
 dependencies {
@@ -38,11 +46,7 @@ jacocoTestReport {
     }
 }
 
-task installFrontEnd(type: NpmTask) {
-    args = ['install', '--prefix', 'src/main/resources']
-}
-
-task buildFrontEnd(type: NpmTask, dependsOn: installFrontEnd) {
+task buildFrontEnd(type: NpmTask, dependsOn: npmInstall) {
     args = ['run', 'build']
 }
 
