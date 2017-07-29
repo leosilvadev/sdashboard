@@ -18,17 +18,16 @@ case class ServerVerticle() extends ScalaVerticle {
 
   override def startFuture(): Future[_] = {
     try {
-      val hasConfigurations = config.fieldNames().containsAll(List("port", "dbName", "dbUrl").asJava)
+      val hasConfigurations = config.fieldNames().containsAll(List("dbName", "dbUrl").asJava)
 
       if (!hasConfigurations) {
         return Future.failed(
-          new RuntimeException("Missing configuration, please check. [port=required, dbName=required, dbUrl=required]")
+          new RuntimeException("Missing configuration, please check. [dbName=required, dbUrl=required]")
         )
       }
 
       val dbName = config.getString("dbName")
       val dbUrl = config.getString("dbUrl")
-      val port = config.getInteger("port")
 
       val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
       val modules = Modules(vertx, mongoClient)
@@ -38,7 +37,7 @@ case class ServerVerticle() extends ScalaVerticle {
 
       modules.dashboard.builder.build()
 
-      server.listen(port)
+      server.listen(8080)
       Future.successful(server)
 
     } catch {

@@ -16,8 +16,7 @@ object Application extends App {
 
   val logger = Logger(classOf[App])
   val vertx = Vertx.vertx()
-  val port = System.getenv().getOrDefault("PORT", "8080").toInt
-  val config = Json.obj(("port", port), ("dbName", System.getenv("DB_NAME")), ("dbUrl", System.getenv("DB_URL")))
+  val config = Json.obj(("dbName", System.getenv("DB_NAME")), ("dbUrl", System.getenv("DB_URL")))
   val options = DeploymentOptions().setConfig(config)
 
   vertx.deployVerticleFuture(ScalaVerticle.nameForVerticle[ServerVerticle], options).onComplete {

@@ -1,10 +1,6 @@
 # sdashboard
 Reactive dashboard for software components built with Scala 2.12, Vert.x 3.4 and RxJava 2
 
-
-
-
-
 ## Want to change something and build locally?
 ```
 docker build -t sdashbard:0.0.1 .
