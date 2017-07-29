@@ -10,14 +10,14 @@ import io.vertx.scala.ext.web.handler.BodyHandler
 /**
   * Created by leonardo on 7/29/17.
   */
-case class ComponentRoutes(vertx: Vertx, componentRepository: ComponentRepository, dashboard: Dashboard) {
+case class ComponentRouter(vertx: Vertx, componentRepository: ComponentRepository, dashboard: Dashboard) {
 
-  def route(): Router = {
+  def routeV1(): Router = {
     val router = Router.router(vertx)
-    router.post("/api/v1/components").handler(BodyHandler.create())
-    router.get("/api/v1/components").handler(ComponentListHandler(componentRepository))
-    router.post("/api/v1/components").handler(ComponentRegisterHandler(componentRepository, dashboard))
-    router.delete("/api/v1/components/:id").handler(ComponentUnregisterHandler(componentRepository, dashboard))
+    router.post().handler(BodyHandler.create())
+    router.post().handler(ComponentRegisterHandler(componentRepository, dashboard))
+    router.get().handler(ComponentListHandler(componentRepository))
+    router.delete("/:id").handler(ComponentUnregisterHandler(componentRepository, dashboard))
     router
   }
 

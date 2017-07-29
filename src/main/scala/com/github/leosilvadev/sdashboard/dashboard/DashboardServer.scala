@@ -1,19 +1,18 @@
 package com.github.leosilvadev.sdashboard.dashboard
 
-import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
+import com.github.leosilvadev.sdashboard.component.ComponentRouter
 import com.github.leosilvadev.sdashboard.component.service.ComponentRepository
-import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
+import com.github.leosilvadev.sdashboard.dashboard.services.DashboardBuilder
+import com.github.leosilvadev.sdashboard.task.services.TaskExecutor
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.lang.scala.ScalaVerticle
-import io.vertx.lang.scala.json.{Json, JsonObject}
-import io.vertx.scala.core.eventbus.Message
+import io.vertx.lang.scala.json.Json
 import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.Router
-import io.vertx.scala.ext.web.handler.sockjs.{SockJSHandler, SockJSHandlerOptions, SockJSSocket}
-import io.vertx.scala.ext.web.handler.{BodyHandler, CorsHandler, StaticHandler}
+import io.vertx.scala.ext.web.handler.{CorsHandler, StaticHandler}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
-
 
 /**
   * Created by leonardo on 7/17/17.
@@ -24,39 +23,36 @@ case class DashboardServer() extends ScalaVerticle {
 
   override def startFuture(): Future[_] = {
     try {
+      val hasConfigurations = config.fieldNames().containsAll(List("port", "dbName", "dbUrl").asJava)
+
+      if (!hasConfigurations) {
+        return Future.failed(
+          new RuntimeException("Missing configuration, please check. [port=required, dbName=required, sdashboard=requred]")
+        )
+      }
+
+      val dbName = config.getString("dbName")
+      val dbUrl = config.getString("dbUrl")
       val port = config.getInteger("port", 8080)
+
       val router = Router.router(vertx)
-      val options = SockJSHandlerOptions().setHeartbeatInterval(2000)
-      val handler = SockJSHandler.create(vertx, options)
-
-      val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", "sdashboard")))
+      val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
       val componentRepository = ComponentRepository(mongoClient)
-      val dashboard = Dashboard(vertx)
+      val taskExecutor = TaskExecutor(vertx)
+      val dashboard = DashboardBuilder(vertx, componentRepository, taskExecutor).build()
 
-      componentRepository.list().subscribe(dashboard.reloadComponents(_), ex => logger.error(ex.getMessage, ex))
+      router.mountSubRouter("/api/v1/components", ComponentRouter(vertx, componentRepository, dashboard).routeV1())
+      router.mountSubRouter("/ws/v1/dashboard", DashboardRouter(vertx).routeV1())
 
       router.route("/").handler(StaticHandler.create("src/main/resources/").setIndexPage("index.html"))
       router.route("/assets/*").handler(StaticHandler.create("src/main/resources/assets"))
 
       router.route().handler(CorsHandler.create("*").allowedHeader("Content-Type"))
-      router.post().handler(BodyHandler.create())
-      router.get("/api/v1/components").handler(ComponentListHandler(componentRepository))
-      router.post("/api/v1/components").handler(ComponentRegisterHandler(componentRepository, dashboard))
-      router.delete("/api/v1/components/:id").handler(ComponentUnregisterHandler(componentRepository, dashboard))
-      router.route("/ws/dashboard/*").handler(handler)
 
       val server = vertx.createHttpServer()
       server.requestHandler(router.accept _)
 
       server.listen(port)
-
-      handler.socketHandler((socket: SockJSSocket) => {
-        logger.info("New client connected, {}", socket.writeHandlerID())
-        vertx.eventBus().consumer("components.status.update", (message: Message[JsonObject]) => {
-          val status = message.body()
-          socket.write(status.encode())
-        })
-      })
 
       Future.successful(server)
 

@@ -2,7 +2,7 @@ import SockJS from 'sockjs-client';
 import * as evt from '../flux/events';
 import {addComponent} from '../flux/actions/components';
 
-const sock = new SockJS('http://localhost:8080/ws/dashboard');
+const sock = new SockJS('http://localhost:8080/ws/v1/dashboard');
 
 sock.onopen = function() {
   console.log('open');

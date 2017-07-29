@@ -1,7 +1,7 @@
 package com.github.leosilvadev.sdashboard.task.domains
 
-import com.github.leosilvadev.sdashboard.component.domains.Status
-import io.reactivex.Observable
+import com.github.leosilvadev.sdashboard.component.domains.{Component, Status}
+import io.reactivex.ObservableEmitter
 import io.vertx.lang.scala.json.JsonObject
 import io.vertx.scala.core.Vertx
 
@@ -10,8 +10,12 @@ import io.vertx.scala.core.Vertx
   */
 trait Task {
 
-  def start(vertx: Vertx): Observable[Status]
+  def run(vertx: Vertx, emitter: ObservableEmitter[Status]): Unit
 
   def toJson: JsonObject
+
+  def getFrequency: Long
+
+  def getComponent: Component
 
 }

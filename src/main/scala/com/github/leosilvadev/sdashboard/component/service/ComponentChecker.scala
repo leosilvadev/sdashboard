@@ -1,17 +1,17 @@
 package com.github.leosilvadev.sdashboard.component.service
 
 import com.github.leosilvadev.sdashboard.component.domains.{Component, Status}
+import com.github.leosilvadev.sdashboard.task.services.TaskExecutor
 import io.reactivex.Observable
 import io.reactivex.Observable._
-import io.vertx.scala.core.Vertx
 
 import scala.collection.JavaConverters._
 
 /**
   * Created by leonardo on 7/11/17.
   */
-case class ComponentChecker(vertx: Vertx, component: Component) {
+case class ComponentChecker(taskExecutor: TaskExecutor, component: Component) {
 
-  def start: Observable[Status] = merge(component.tasks.map(_.start(vertx)).asJava)
+  def start: Observable[Status] = merge(component.tasks.map(taskExecutor.execute).asJava)
 
 }
