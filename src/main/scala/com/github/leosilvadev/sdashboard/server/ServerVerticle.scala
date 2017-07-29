@@ -30,6 +30,7 @@ case class ServerVerticle() extends ScalaVerticle {
       val dbUrl = config.getString("dbUrl")
 
       val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
+
       val modules = Modules(vertx, mongoClient)
       val server = vertx.createHttpServer()
 

@@ -31,6 +31,7 @@ dependencies {
     compile 'io.vertx:vertx-web-client-scala_2.12:3.4.2'
     compile 'io.vertx:vertx-auth-common-scala_2.12:3.4.2'
     compile 'io.vertx:vertx-mongo-client-scala_2.12:3.4.2'
+    compile 'io.vertx:vertx-auth-mongo-scala_2.12:3.4.2'
     compile 'io.reactivex.rxjava2:rxjava:2.1.1'
     compile 'com.typesafe.scala-logging:scala-logging_2.12:3.7.1'
     scoverage 'org.scoverage:scalac-scoverage-plugin_2.12:1.3.0'
