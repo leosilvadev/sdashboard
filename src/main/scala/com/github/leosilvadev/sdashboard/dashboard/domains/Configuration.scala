@@ -6,9 +6,7 @@ import io.vertx.lang.scala.json.JsonObject
 /**
   * Created by leonardo on 7/11/17.
   */
-case class Configuration(components: List[Component]) {
-
-}
+case class Configuration(components: List[Component])
 
 object Configuration {
 
@@ -20,5 +18,5 @@ object Configuration {
     })
     Configuration(components)
   }
-  
+
 }

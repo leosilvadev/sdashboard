@@ -1,6 +1,6 @@
 package com.github.leosilvadev.sdashboard
 
-import com.github.leosilvadev.sdashboard.dashboard.DashboardServer
+import com.github.leosilvadev.sdashboard.server.ServerVerticle
 import com.typesafe.scalalogging.Logger
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
@@ -20,7 +20,7 @@ object Application extends App {
   val config = Json.obj(("port", port), ("dbName", System.getenv("DB_NAME")), ("dbUrl", System.getenv("DB_URL")))
   val options = DeploymentOptions().setConfig(config)
 
-  vertx.deployVerticleFuture(ScalaVerticle.nameForVerticle[DashboardServer], options).onComplete {
+  vertx.deployVerticleFuture(ScalaVerticle.nameForVerticle[ServerVerticle], options).onComplete {
     case Success(result) => logger.debug("Server running {}", result)
     case Failure(ex) => {
       logger.error(ex.getMessage, ex)

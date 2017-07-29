@@ -10,8 +10,8 @@ import scala.collection.JavaConverters._
 /**
   * Created by leonardo on 7/11/17.
   */
-case class ComponentChecker(taskExecutor: TaskExecutor, component: Component) {
+case class ComponentChecker(taskExecutor: TaskExecutor) {
 
-  def start: Observable[Status] = merge(component.tasks.map(taskExecutor.execute).asJava)
+  def start(component: Component): Observable[Status] = merge(component.tasks.map(taskExecutor.execute).asJava)
 
 }
