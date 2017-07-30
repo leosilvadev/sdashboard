@@ -9,7 +9,6 @@ export default class ComponentData extends React.Component {
     constructor(props) {
         super(props);
 
-        this.objectToComponents = this.objectToComponents.bind(this);
         this.state = {
             error: this.props.error,
             data: this.props.data
@@ -21,6 +20,7 @@ export default class ComponentData extends React.Component {
         return keys.map(key => {
             const value = data[key];
             return {key, value};
+
         }).map(({key, value}) => {
             if (typeof value === 'object') {
                 value = <Highlight>{JSON.stringify(value)}</Highlight>;

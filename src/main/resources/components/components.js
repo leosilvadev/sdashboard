@@ -1,8 +1,11 @@
 import React from 'react';
 import Component from './component';
 import componentsStore from '../flux/stores/components';
+import adminStore from '../flux/stores/admin';
 import ComponentRegistration from './componentRegistration';
 import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+
+import Socket from '../ws/socket';
 
 import './components.scss';
 
@@ -15,9 +18,11 @@ export default class Components extends React.Component {
         this.state = {
             components: componentsStore.getComponents()
         }
+        this.render = this.render.bind(this);
     }
 
     componentDidMount() {
+        new Socket().start();
         componentsStore.on('componentsUpdated', () => {
             this.setState(componentsStore.getComponents())
         });
@@ -41,20 +46,20 @@ export default class Components extends React.Component {
             <Component key={component._id} component={component}>
             </Component>
         );
-        return  <div className="components_wrapper container">
-                <Navbar>
-                    <Navbar.Header>
-                        <Navbar.Brand>
-                            <a href="#">SDashboard</a>
-                        </Navbar.Brand>
-                    </Navbar.Header>
-                    <Nav>
-                        <NavItem eventKey={1} href="#">Dashboard</NavItem>
-                        <NavItem eventKey={2} className="component_registration">
-                            <ComponentRegistration></ComponentRegistration>
-                        </NavItem>
-                    </Nav>
-                </Navbar>
+        return <div className="components_wrapper container">
+                    <Navbar>
+                        <Navbar.Header>
+                            <Navbar.Brand>
+                                <a href="#">SDashboard</a>
+                            </Navbar.Brand>
+                        </Navbar.Header>
+                        <Nav>
+                            <NavItem eventKey={1} href="#">Dashboard</NavItem>
+                            <NavItem eventKey={2} className="component_registration">
+                                <ComponentRegistration></ComponentRegistration>
+                            </NavItem>
+                        </Nav>
+                    </Navbar>
                     <div className="components_body">
                         {data}
                     </div>
