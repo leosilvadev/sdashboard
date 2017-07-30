@@ -5,6 +5,7 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
 import io.vertx.scala.ext.mongo.MongoClient
+import io.vertx.scala.ext.web.client.WebClient
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -30,8 +31,8 @@ case class ServerVerticle() extends ScalaVerticle {
       val dbUrl = config.getString("dbUrl")
 
       val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
-
-      val modules = Modules(vertx, mongoClient)
+      val webClient = WebClient.create(vertx)
+      val modules = Modules(vertx, mongoClient, webClient)
       val server = vertx.createHttpServer()
 
       server.requestHandler(ServerRouter(vertx, modules).route().accept(_))

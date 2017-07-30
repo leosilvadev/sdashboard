@@ -4,16 +4,17 @@ import com.github.leosilvadev.sdashboard.component.domains.Status
 import com.github.leosilvadev.sdashboard.task.domains.Task
 import io.reactivex.Observable
 import io.vertx.scala.core.Vertx
+import io.vertx.scala.ext.web.client.WebClient
 
 /**
   * Created by leonardo on 7/29/17.
   */
-case class TaskExecutor(vertx: Vertx) {
+case class TaskExecutor(vertx: Vertx, client: WebClient) {
 
   def execute(task: Task): Observable[Status] = {
     Observable.create[Status](emitter => {
       vertx.setPeriodic(task.getFrequency, n => {
-        task.run(vertx, emitter)
+        task.run(client, emitter)
       })
     })
   }
