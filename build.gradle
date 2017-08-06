@@ -53,6 +53,10 @@ task buildFrontEnd(type: NpmTask, dependsOn: npmInstall) {
     args = ['run', 'build']
 }
 
+task genKeystore {
+    def secret = System.getenv("JWT_SECRET") ?: 'secret'
+    "keytool -genseckey -keystore src/main/resources/keystore.jceks -storetype jceks -storepass $secret -keyalg HMacSHA256 -keysize 2048 -alias HS256 -keypass $secret".execute()
+}
 
-installDist.dependsOn buildFrontEnd
+installDist.dependsOn(buildFrontEnd, genKeystore)
 check.dependsOn jacocoTestReport

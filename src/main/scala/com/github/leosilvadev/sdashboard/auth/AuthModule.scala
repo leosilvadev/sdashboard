@@ -18,9 +18,9 @@ case class AuthModule(vertx: Vertx, mongoClient: MongoClient) {
   lazy val jWTAuth = JWTAuth.create(vertx,
     Json.obj(
       ("keyStore", Json.obj(
-        ("path", "jwt/keystore.jceks"),
+        ("path", "keystore.jceks"),
         ("type", "jceks"),
-        ("password", "secret"))
+        ("password", System.getenv().getOrDefault("JWT_SECRET", "secret")))
       )
     )
   )
