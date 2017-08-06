@@ -11,18 +11,23 @@ class AdminStore extends EventEmitter {
         this.admin = {};
         this.login = this.login.bind(this);
         this.action = this.action.bind(this);
+        this.getAdmin = this.getAdmin.bind(this);
     }
 
     login(user) {
-        axios.post('/api/v1/admin/auth', user)
+        axios.post('/api/v1/auth', user)
           .then(response => {
-            console.log(`Admin ${username} authenticated!`);
-            this.admin = user;
+            console.log(`Admin ${user.username} authenticated!`);
+            this.admin = Object.assign({}, user, {token: response.data.token});
             this.emit('adminAuthenticated');
           })
           .catch(error => {
-            console.log(error);
+            console.error(error);
           });
+    }
+
+    getAdmin() {
+        return this.admin;
     }
 
     action({type, payload}) {

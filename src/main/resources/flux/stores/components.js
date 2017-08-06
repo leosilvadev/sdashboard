@@ -2,6 +2,7 @@ import axios from 'axios';
 import EventEmitter from 'events';
 import dispatcher from '../dispatcher';
 import * as evt from '../events';
+import adminStore from './admin';
 
 class ComponentsStore extends EventEmitter {
 
@@ -26,8 +27,11 @@ class ComponentsStore extends EventEmitter {
     }
 
     registerComponent(component) {
-        axios.post('/api/v1/components', component)
-          .then(response => {
+        axios.post('/api/v1/components', component, {
+            headers: {
+                Authorization: "Bearer " + adminStore.getAdmin().token
+            }
+        }).then(response => {
             console.log(`Component ${component.name} registered successfully!`);
           })
           .catch(error => {

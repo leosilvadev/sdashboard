@@ -29,6 +29,7 @@ case class Response(context: RoutingContext) {
 
   def internalError(ex: Throwable): Unit = {
     logger.error(ex.getMessage, ex)
+    ex.printStackTrace()
     respond(500, Json.obj(("message", ex.getMessage)))
   }
 
@@ -38,6 +39,10 @@ case class Response(context: RoutingContext) {
 
   def ok(json: JsonArray): Unit = {
     respond(200, json)
+  }
+
+  def unauthorized(): Unit = {
+    respond(401)
   }
 
   def respond(status: Int, json: JsonObject = Json.emptyObj()): Unit = {

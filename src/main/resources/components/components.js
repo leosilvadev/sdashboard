@@ -4,12 +4,13 @@ import componentsStore from '../flux/stores/components';
 import adminStore from '../flux/stores/admin';
 import ComponentRegistration from './componentRegistration';
 import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
 
 import Socket from '../ws/socket';
 
 import './components.scss';
 
-export default class Components extends React.Component {
+class Components extends React.Component {
 
     constructor(props) {
         super(props);
@@ -22,7 +23,12 @@ export default class Components extends React.Component {
     }
 
     componentDidMount() {
-        new Socket().start();
+        const token = adminStore.getAdmin().token;
+        if (!token) {
+            this.props.history.push('/');
+            return;
+        }
+        new Socket().start(token);
         componentsStore.on('componentsUpdated', () => {
             this.setState(componentsStore.getComponents())
         });
@@ -67,3 +73,5 @@ export default class Components extends React.Component {
     }
 
 }
+
+export default withRouter(Components);

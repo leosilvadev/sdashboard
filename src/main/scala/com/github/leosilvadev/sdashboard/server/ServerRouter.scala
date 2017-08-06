@@ -13,9 +13,12 @@ case class ServerRouter(vertx: Vertx, modules: Modules) {
 
   def route(): Router = {
     val router = Router.router(vertx)
-    router.route("/api/*").handler(modules.auth.authorizationHandler)
     router.mountSubRouter("/", StaticRouter(vertx).route())
+    router.mountSubRouter("/api/v1/auth", modules.auth.router.routeV1())
+
+    router.route("/api/v1/components/*").handler(modules.auth.authorizationMiddleware)
     router.mountSubRouter("/api/v1/components", modules.component.router.routeV1())
+
     router.mountSubRouter("/ws/v1/dashboard", modules.dashboard.router.routeV1())
     router.route().handler(CorsHandler.create("*").allowedHeader("Content-Type"))
     router

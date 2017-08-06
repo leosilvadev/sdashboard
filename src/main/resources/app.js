@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Login from './components/login';
 import Components from './components/components';
-import { HashRouter, Route } from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom';
 
 import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 

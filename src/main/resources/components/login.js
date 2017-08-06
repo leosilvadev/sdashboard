@@ -4,8 +4,9 @@ import { login } from '../flux/actions/admin';
 import { Modal, Button } from 'react-bootstrap';
 import { Form } from 'formsy-react';
 import Input from './input';
+import { withRouter } from 'react-router-dom';
 
-export default class Login extends React.Component {
+class Login extends React.Component {
 
     constructor(props) {
         super(props);
@@ -17,6 +18,7 @@ export default class Login extends React.Component {
 
     componentDidMount() {
         adminStore.on('adminAuthenticated', () => {
+            this.props.history.push('/components');
         });
     }
 
@@ -51,5 +53,6 @@ export default class Login extends React.Component {
             </div>
         );
     }
-
 }
+
+export default withRouter(Login);

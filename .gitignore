@@ -1,6 +1,8 @@
 .gradle/
 .idea/
+.vertx/
 build/
 node_modules/
 assets/
+keystore.jceks
 

@@ -1,10 +1,13 @@
 package com.github.leosilvadev.sdashboard.server
 
 import com.github.leosilvadev.sdashboard.Modules
+import com.github.leosilvadev.sdashboard.util.database.DatabaseMigrationRunner
+import com.mongodb.client.model.Indexes
 import io.vertx.core.logging.LoggerFactory
+import io.vertx.ext.mongo.impl.MongoClientImpl
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
-import io.vertx.scala.ext.mongo.MongoClient
+import io.vertx.scala.ext.mongo.{IndexOptions, MongoClient}
 import io.vertx.scala.ext.web.client.WebClient
 
 import scala.collection.JavaConverters._
@@ -31,6 +34,8 @@ case class ServerVerticle() extends ScalaVerticle {
       val dbUrl = config.getString("dbUrl")
 
       val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
+      DatabaseMigrationRunner(mongoClient).migrate()
+
       val webClient = WebClient.create(vertx)
       val modules = Modules(vertx, mongoClient, webClient)
       val server = vertx.createHttpServer()
