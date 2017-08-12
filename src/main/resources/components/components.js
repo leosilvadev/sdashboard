@@ -1,9 +1,8 @@
 import React from 'react';
+import AdminMenu from './adminMenu';
 import Component from './component';
 import componentsStore from '../flux/stores/components';
 import adminStore from '../flux/stores/admin';
-import ComponentRegistration from './componentRegistration';
-import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 
 import Socket from '../ws/socket';
@@ -15,11 +14,19 @@ class Components extends React.Component {
     constructor(props) {
         super(props);
 
-        this.component = {};
+        this.socket = new Socket();
         this.state = {
             components: componentsStore.getComponents()
         }
         this.render = this.render.bind(this);
+        this.updateComponents = this.updateComponents.bind(this);
+        this.goToIndex = this.goToIndex.bind(this);
+    }
+
+    componentWillUnmount() {
+        this.socket.stop();
+        componentsStore.removeListener('componentsUpdated', this.updateComponents);
+        adminStore.removeListener('adminLoggedOut', this.goToIndex);
     }
 
     componentDidMount() {
@@ -28,10 +35,18 @@ class Components extends React.Component {
             this.props.history.push('/');
             return;
         }
-        new Socket().start(token);
-        componentsStore.on('componentsUpdated', () => {
-            this.setState(componentsStore.getComponents())
-        });
+
+        this.socket.start(token);
+        componentsStore.on('componentsUpdated', this.updateComponents);
+        adminStore.on('adminLoggedOut', this.goToIndex);
+    }
+
+    updateComponents() {
+        return this.setState({components: componentsStore.getComponents()});
+    }
+
+    goToIndex() {
+        return this.props.history.push('/');
     }
 
     load(components) {
@@ -53,19 +68,7 @@ class Components extends React.Component {
             </Component>
         );
         return <div className="components_wrapper container">
-                    <Navbar>
-                        <Navbar.Header>
-                            <Navbar.Brand>
-                                <a href="#">SDashboard</a>
-                            </Navbar.Brand>
-                        </Navbar.Header>
-                        <Nav>
-                            <NavItem eventKey={1} href="#">Dashboard</NavItem>
-                            <NavItem eventKey={2} className="component_registration">
-                                <ComponentRegistration></ComponentRegistration>
-                            </NavItem>
-                        </Nav>
-                    </Navbar>
+                    <AdminMenu></AdminMenu>
                     <div className="components_body">
                         {data}
                     </div>

@@ -5,13 +5,13 @@ import {addComponent} from '../flux/actions/components';
 export default class Socket {
 
     start(token) {
-        const sock = new SockJS(`http://localhost:8080/ws/v1/dashboard?token=${token}`);
+        this.sock = new SockJS(`http://localhost:8080/ws/v1/dashboard?token=${token}`);
 
-        sock.onopen = function() {
+        this.sock.onopen = function() {
           console.log('open');
         };
 
-        sock.onmessage = function(e) {
+        this.sock.onmessage = function(e) {
             const {component, status, datetime, data, error, socket_error} = JSON.parse(e.data);
             if (socket_error) {
                 console.error(socket_error);
@@ -21,9 +21,15 @@ export default class Socket {
             addComponent(comp);
         };
 
-        sock.onclose = function() {
+        this.sock.onclose = function() {
           console.log('close');
         };
+    }
+
+    stop() {
+        if (this.sock) {
+            this.sock.close();
+        }
     }
 
 }

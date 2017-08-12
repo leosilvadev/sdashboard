@@ -26,6 +26,11 @@ class AdminStore extends EventEmitter {
           });
     }
 
+    logout() {
+        this.admin = {};
+        this.emit('adminLoggedOut');
+    }
+
     getAdmin() {
         return this.admin;
     }
@@ -34,6 +39,9 @@ class AdminStore extends EventEmitter {
         switch(type) {
             case evt.LOGIN:
                 this.login(payload);
+                break;
+            case evt.LOGOUT:
+                this.logout();
                 break;
         }
     }
