@@ -3,7 +3,7 @@ package com.github.leosilvadev.sdashboard.server
 import com.github.leosilvadev.sdashboard.Modules
 import com.github.leosilvadev.sdashboard.util.database.DatabaseMigrationRunner
 import com.typesafe.scalalogging.Logger
-import io.vertx.lang.scala.ScalaVerticle
+import io.vertx.lang.scala.{ScalaVerticle, VertxExecutionContext}
 import io.vertx.lang.scala.json.Json
 import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.client.WebClient
@@ -48,7 +48,7 @@ case class ServerVerticle() extends ScalaVerticle {
         route.getPath().foreach(logger.info(_))
       })
       logger.info("# SDashboard routes configured.")
-      server.listen(8080)
+      server.listenFuture(8080)
       Future.successful(server)
 
     } catch {

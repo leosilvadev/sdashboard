@@ -1,7 +1,7 @@
 package com.github.leosilvadev.sdashboard.component
 
 import com.github.leosilvadev.sdashboard.component.handlers.{ComponentListHandler, ComponentRegisterHandler, ComponentUnregisterHandler}
-import com.github.leosilvadev.sdashboard.component.service.{ComponentChecker, ComponentRepository}
+import com.github.leosilvadev.sdashboard.component.service.{ComponentChecker, ComponentRepository, ComponentStatusUpdater}
 import com.github.leosilvadev.sdashboard.task.TaskModule
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.ext.mongo.MongoClient
@@ -19,5 +19,7 @@ case class ComponentModule(vertx: Vertx, client: MongoClient, taskModule: TaskMo
   lazy val unregisterHandler = ComponentUnregisterHandler(repository)
 
   lazy val router = ComponentRouter(vertx, listHandler, registerHandler, unregisterHandler)
+
+  ComponentStatusUpdater(vertx, repository)
 
 }

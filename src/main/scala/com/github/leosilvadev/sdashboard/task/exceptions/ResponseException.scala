@@ -17,7 +17,9 @@ case class ResponseException(statusCode: Int, text: String) extends RuntimeExcep
 
 object ResponseException {
 
-  def apply(ex: Throwable): ResponseException = new ResponseException(500, ex.getMessage)
+  def apply(message: String): ResponseException = new ResponseException(500, message)
+
+  def apply(ex: Throwable): ResponseException = ResponseException(ex.getMessage)
 
   def apply(response: HttpResponse[Buffer]): ResponseException =
     new ResponseException(response.statusCode(), response.bodyAsString("UTF-8").getOrElse("Empty response"))

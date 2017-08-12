@@ -38,6 +38,15 @@ object Status {
 
   }
 
+  def of(json: JsonObject): Option[Status] = {
+    val component = Component(json.getJsonObject("component"))
+    json.getString("status", "unknown") match {
+      case "online" => Some(Online(component, json.getJsonObject("data")))
+      case "offline" => Some(Offline(component, ResponseException(json.getString("error"))))
+      case _ => None
+    }
+  }
+
 }
 
 
