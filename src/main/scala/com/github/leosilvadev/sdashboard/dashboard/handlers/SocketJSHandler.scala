@@ -1,8 +1,7 @@
 package com.github.leosilvadev.sdashboard.dashboard.handlers
 
+import com.typesafe.scalalogging.Logger
 import io.vertx.core.Handler
-import io.vertx.core.buffer.Buffer
-import io.vertx.core.logging.{Logger, LoggerFactory}
 import io.vertx.lang.scala.json.{Json, JsonObject}
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.core.eventbus.Message
@@ -14,7 +13,7 @@ import io.vertx.scala.ext.web.handler.sockjs.SockJSSocket
   */
 case class SocketJSHandler(vertx: Vertx, jWTAuth: JWTAuth) extends Handler[SockJSSocket] {
 
-  val logger: Logger = LoggerFactory.getLogger(classOf[SocketJSHandler])
+  val logger = Logger(classOf[SocketJSHandler])
 
   override def handle(socket: SockJSSocket): Unit = {
     val uri = socket.uri()

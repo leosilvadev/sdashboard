@@ -33,6 +33,8 @@ COPY gradlew gradlew
 COPY src src
 COPY gradle gradle
 
+ENV JWT_SECRET ${JWT_SECRET}
+
 RUN ./gradlew installDist
 
 ENTRYPOINT ./build/install/sdashboard/bin/sdashboard

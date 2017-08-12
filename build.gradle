@@ -25,6 +25,7 @@ node {
 }
 
 dependencies {
+    compile 'ch.qos.logback:logback-classic:1.2.3'
     compile 'org.scala-lang:scala-library:2.12.2'
     compile 'io.vertx:vertx-web-scala_2.12:3.4.2'
     compile 'io.vertx:vertx-mongo-client-scala_2.12:3.4.2'
@@ -58,5 +59,4 @@ task genKeystore {
     "keytool -genseckey -keystore src/main/resources/keystore.jceks -storetype jceks -storepass $secret -keyalg HMacSHA256 -keysize 2048 -alias HS256 -keypass $secret".execute()
 }
 
-installDist.dependsOn(buildFrontEnd, genKeystore)
 check.dependsOn jacocoTestReport

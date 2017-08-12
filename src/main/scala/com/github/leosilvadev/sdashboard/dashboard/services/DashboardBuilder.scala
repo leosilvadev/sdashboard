@@ -3,7 +3,7 @@ package com.github.leosilvadev.sdashboard.dashboard.services
 import com.github.leosilvadev.sdashboard.component.domains.Component
 import com.github.leosilvadev.sdashboard.component.service.{ComponentChecker, ComponentRepository}
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
-import io.vertx.core.logging.LoggerFactory
+import com.typesafe.scalalogging.Logger
 import io.vertx.lang.scala.json.JsonObject
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.core.eventbus.Message
@@ -13,7 +13,7 @@ import io.vertx.scala.core.eventbus.Message
   */
 case class DashboardBuilder(vertx: Vertx, componentRepository: ComponentRepository, componentChecker: ComponentChecker) {
 
-  val logger = LoggerFactory.getLogger(classOf[DashboardBuilder])
+  val logger = Logger(classOf[DashboardBuilder])
 
   def build(): Dashboard ={
     val dashboard = Dashboard(vertx, componentChecker)

@@ -2,12 +2,10 @@ package com.github.leosilvadev.sdashboard.server
 
 import com.github.leosilvadev.sdashboard.Modules
 import com.github.leosilvadev.sdashboard.util.database.DatabaseMigrationRunner
-import com.mongodb.client.model.Indexes
-import io.vertx.core.logging.LoggerFactory
-import io.vertx.ext.mongo.impl.MongoClientImpl
+import com.typesafe.scalalogging.Logger
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
-import io.vertx.scala.ext.mongo.{IndexOptions, MongoClient}
+import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.client.WebClient
 
 import scala.collection.JavaConverters._
@@ -18,7 +16,7 @@ import scala.concurrent.Future
   */
 case class ServerVerticle() extends ScalaVerticle {
 
-  val logger = LoggerFactory.getLogger(classOf[ServerVerticle])
+  val logger = Logger(classOf[ServerVerticle])
 
   override def startFuture(): Future[_] = {
     try {
@@ -40,10 +38,16 @@ case class ServerVerticle() extends ScalaVerticle {
       val modules = Modules(vertx, mongoClient, webClient)
       val server = vertx.createHttpServer()
 
-      server.requestHandler(ServerRouter(vertx, modules).route().accept(_))
+      val router = ServerRouter(vertx, modules).route()
+      server.requestHandler(router.accept(_))
 
       modules.dashboard.builder.build()
 
+      logger.info("# Configuring SDashboard routes...")
+      router.getRoutes().foreach(route => {
+        route.getPath().foreach(logger.info(_))
+      })
+      logger.info("# SDashboard routes configured.")
       server.listen(8080)
       Future.successful(server)
 
