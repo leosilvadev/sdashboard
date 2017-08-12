@@ -25,8 +25,8 @@ case class AuthModule(vertx: Vertx, mongoClient: MongoClient) {
     )
   )
 
-  lazy val adminAuthenticationHandler = AdminAuthenticationHandler(authProvider, jWTAuth)
-  lazy val authorizationMiddleware = AuthorizationMiddleware(jWTAuth)
+  lazy val adminAuthenticationHandler = AdminAuthenticationHandler(vertx, authProvider, jWTAuth)
+  lazy val authorizationMiddleware = AuthorizationMiddleware(vertx, jWTAuth)
 
   lazy val router = AuthRouter(vertx, adminAuthenticationHandler)
 

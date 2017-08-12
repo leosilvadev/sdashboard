@@ -24,37 +24,31 @@ case class ComponentRepository(vertx: Vertx, client: MongoClient) {
 
   def register(component: Component): Single[String] = {
     Single.create(emitter => {
-      client.save(collection, component.toJson, result => {
-        if (result.succeeded()) {
-          emitter.onSuccess(component.id)
-        } else {
-          emitter.onError(result.cause())
-        }
-      })
+      client.saveFuture(collection, component.toJson).onComplete {
+        case Success(_) => emitter.onSuccess(component.id)
+        case Failure(ex) => emitter.onError(ex)
+      }
     })
   }
 
   def unregister(id: String): Single[String] = {
     Single.create(emitter => {
-      client.remove(collection, Json.obj(("_id", id)), result => {
-        if (result.succeeded()) {
-          emitter.onSuccess(id)
-        } else {
-          emitter.onError(result.cause())
-        }
-      })
+      client.removeFuture(collection, Json.obj(("_id", id))).onComplete {
+        case Success(_) => emitter.onSuccess(id)
+        case Failure(ex) => emitter.onError(ex)
+      }
     })
   }
 
   def list(query: JsonObject = Json.emptyObj()): Single[List[Component]] = {
     Single.create(emitter => {
-      client.find(collection, query, result => {
-        if (result.succeeded()) {
-          emitter.onSuccess(result.result().map(Component.apply).toList)
-        } else {
-          emitter.onError(result.cause())
-        }
-      })
+      client.findFuture(collection, query).onComplete {
+        case Success(components) =>
+          emitter.onSuccess(components.map(Component.apply).toList)
+
+        case Failure(ex) =>
+          emitter.onError(ex)
+      }
     })
   }
 
