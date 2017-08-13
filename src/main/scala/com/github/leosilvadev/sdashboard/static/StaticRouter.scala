@@ -11,8 +11,8 @@ case class StaticRouter(vertx: Vertx) {
 
   def route(): Router = {
     val router = Router.router(vertx)
-    router.get("/").handler(StaticHandler.create("src/main/resources/").setIndexPage("index.html"))
-    router.get("/assets/*").handler(StaticHandler.create("src/main/resources/assets"))
+    router.get("/").handler(StaticHandler.create("src/main/resources/ui/build/").setIndexPage("index.html"))
+    router.get("/assets/*").handler(StaticHandler.create("src/main/resources/ui/build/assets"))
     router
   }
 

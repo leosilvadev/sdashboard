@@ -21,7 +21,7 @@ node {
     download = false
     workDir = file("${project.buildDir}/nodejs")
     npmWorkDir = file("${project.buildDir}/npm")
-    nodeModulesDir = file("${project.projectDir}/src/main/resources/node_modules")
+    nodeModulesDir = file("${project.projectDir}/src/main/resources/ui/node_modules")
 }
 
 dependencies {

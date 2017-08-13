@@ -28,8 +28,12 @@ case class ComponentRegisterHandler(repository: ComponentRepository) extends Han
       })
       .subscribe(c => response.created(c.id), ex => {
         ex match {
-          case _: MongoWriteException => response.badRequest(List("name"))
-          case error: Exception => response.internalError(error)
+          case _: MongoWriteException => {
+            response.badRequest(List("name"))
+          }
+          case error: Exception => {
+            response.internalError(error)
+          }
         }
       })
   }

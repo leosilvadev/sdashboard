@@ -15,15 +15,16 @@ import scala.util.{Failure, Success}
   */
 case class AuthorizationMiddleware(vertx: Vertx, jWTAuth: JWTAuth) extends Handler[RoutingContext] {
 
-  protected implicit val executionContext = VertxExecutionContext(vertx.getOrCreateContext())
-
   override def handle(context: RoutingContext): Unit = {
     Auth.tokenFromHeader(context) match {
       case Some(token) =>
-        jWTAuth.authenticateFuture(Json.obj(("jwt", token))).onComplete {
-          case Success(_) => context.next()
-          case Failure(_) => context.fail(401)
-        }
+        jWTAuth.authenticate(Json.obj(("jwt", token)), result => {
+          if (result.succeeded()) {
+            context.next()
+          } else {
+            context.fail(401)
+          }
+        })
       case None => context.fail(401)
     }
   }

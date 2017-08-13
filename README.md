@@ -12,6 +12,7 @@ docker build --build-arg JWT_SECRET=sdasbhoard -t sdashbard:0.0.1 .
 ```
 
 then run:
+mongodb://<dbuser>:<dbpassword>@ds127153.mlab.com:27153/sdashboard
 ```
 docker run -p 80:8080 -e JWT_SECRET=sdasbhoard -e DB_NAME=sdashboard -e DB_URL=mongodb://username:password@host:port sdashboard:0.0.1
 ```

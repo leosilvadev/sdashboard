@@ -16,7 +16,8 @@ case class ComponentSnapshot(id: String, componentId: String, data: JsonObject, 
   }
 
   def isSameResponseOf(snapshot: ComponentSnapshot): Boolean = {
-    (error.nonEmpty && error.equals(snapshot.error)) || (!data.isEmpty && data.eq(snapshot.data))
+    (error.nonEmpty && snapshot.error.nonEmpty && error.equals(snapshot.error)) ||
+      (!data.isEmpty && !snapshot.data.isEmpty && data.equals(snapshot.data))
   }
 
   def setLastUpdate(): ComponentSnapshot = {
@@ -32,7 +33,7 @@ object ComponentSnapshot {
   def apply(json: JsonObject): ComponentSnapshot = {
     new ComponentSnapshot(
       json.getString("_id", UUID.randomUUID().toString),
-      json.getString("component_id"),
+      json.getString("component_id", ""),
       json.getJsonObject("data", Json.emptyObj()),
       json.getString("error", ""),
       json.getInstant("last_update", Instant.now())
@@ -44,10 +45,10 @@ object ComponentSnapshot {
       case Active() => None
       case _ =>
         val json = status.toJson
-        val componentId = json.getJsonObject("component", Json.emptyObj()).getString("_id")
-        val data = json.getJsonObject("data")
-        val error = json.getString("error")
-        val lastUpdate = json.getInstant("datetime")
+        val componentId = json.getJsonObject("component", Json.emptyObj()).getString("_id", "")
+        val data = json.getJsonObject("data", Json.emptyObj())
+        val error = json.getString("error", "")
+        val lastUpdate = json.getInstant("datetime", Instant.now())
         Some(ComponentSnapshot(componentId, data, error, lastUpdate))
     }
   }
