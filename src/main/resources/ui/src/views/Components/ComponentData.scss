@@ -1,0 +1,19 @@
+.component_label {
+    text-align: center;
+    padding: 5px !important;
+    width: 30%;
+}
+
+.component_value {
+    text-align: left;
+    padding: 5px !important;
+    width: 70%;
+
+    pre {
+        margin-bottom: 0 !important;
+    }
+
+    code {
+        background: transparent !important;
+    }
+}
