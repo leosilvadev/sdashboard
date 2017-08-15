@@ -18,7 +18,11 @@ object Application extends App {
 
   implicit val executionContext = VertxExecutionContext(vertx.getOrCreateContext())
 
-  val config = Json.obj(("dbName", System.getenv("DB_NAME")), ("dbUrl", System.getenv("DB_URL")))
+  val config = Json.obj(
+    ("dbName", System.getenv("DB_NAME")),
+    ("dbUrl", System.getenv("DB_URL")),
+    ("bootstrapFilePath", System.getenv().getOrDefault("BOOTSTRAP_FILE_PATH", "dashboard.json"))
+  )
   val options = DeploymentOptions().setConfig(config)
 
   vertx.deployVerticleFuture(ScalaVerticle.nameForVerticle[ServerVerticle], options).onComplete {

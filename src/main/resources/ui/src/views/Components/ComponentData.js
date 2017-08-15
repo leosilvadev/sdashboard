@@ -5,7 +5,7 @@ import { Table, Jumbotron } from 'reactstrap';
 import './ComponentData.scss';
 
 export default class ComponentData extends Component {
-b
+
     constructor(props) {
         super(props);
 

@@ -3,7 +3,8 @@ package com.github.leosilvadev.sdashboard.server
 import com.github.leosilvadev.sdashboard.Modules
 import com.github.leosilvadev.sdashboard.util.database.DatabaseMigrationRunner
 import com.typesafe.scalalogging.Logger
-import io.vertx.lang.scala.{ScalaVerticle, VertxExecutionContext}
+import io.vertx.core.json.JsonArray
+import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
 import io.vertx.scala.ext.mongo.MongoClient
 import io.vertx.scala.ext.web.client.WebClient
@@ -30,30 +31,40 @@ case class ServerVerticle() extends ScalaVerticle {
 
       val dbName = config.getString("dbName")
       val dbUrl = config.getString("dbUrl")
+      val bootstrapFilePath = config.getString("bootstrapFilePath")
 
-      val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
-      DatabaseMigrationRunner(mongoClient).migrate()
+      var componentsBootstrap = new JsonArray()
+      try {
+        componentsBootstrap = vertx.fileSystem().readFileBlocking(bootstrapFilePath).toJsonArray
+      } catch {
+        case ex => logger.warn("No component loaded from bootstrap file", ex)
+      }
 
-      val webClient = WebClient.create(vertx)
-      val modules = Modules(vertx, mongoClient, webClient)
-      val server = vertx.createHttpServer()
+      try {
+        val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
+        DatabaseMigrationRunner(mongoClient).migrate()
 
-      val router = ServerRouter(vertx, modules).route()
-      server.requestHandler(router.accept(_))
+        val webClient = WebClient.create(vertx)
+        val modules = Modules(vertx, mongoClient, webClient)
+        val server = vertx.createHttpServer()
 
-      modules.dashboard.builder.build()
+        val router = ServerRouter(vertx, modules).route()
+        server.requestHandler(router.accept(_))
 
-      logger.info("# Configuring SDashboard routes...")
-      router.getRoutes().foreach(route => {
-        route.getPath().foreach(logger.info(_))
-      })
-      logger.info("# SDashboard routes configured.")
-      server.listenFuture(8080)
-      Future.successful(server)
+        modules.dashboard.builder.build(componentsBootstrap)
 
-    } catch {
-      case ex: Exception => Future.failed(ex)
+        logger.info("# Configuring SDashboard routes...")
+        router.getRoutes().foreach(route => {
+          route.getPath().foreach(logger.info(_))
+        })
+        logger.info("# SDashboard routes configured.")
+        server.listenFuture(8080)
+        Future.successful(server)
 
+      } catch {
+        case ex: Exception => Future.failed(ex)
+
+      }
     }
   }
 

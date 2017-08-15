@@ -27,13 +27,16 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 
 RUN apt-get update && apt-get install -y build-essential
 
+WORKDIR /app
+
 COPY build.gradle build.gradle
 COPY settings.gradle settings.gradle
 COPY gradlew gradlew
 COPY src src
 COPY gradle gradle
 
-ENV JWT_SECRET ${JWT_SECRET}
+ARG secret
+ENV JWT_SECRET ${secret}
 
 RUN ./gradlew installDist
 

@@ -55,8 +55,11 @@ task buildFrontEnd(type: NpmTask, dependsOn: npmInstall) {
 }
 
 task genKeystore {
+    outputs.upToDateWhen { false }
     def secret = System.getenv("JWT_SECRET") ?: 'secret'
+    println "Generating keystore with secret: $secret ..."
     "keytool -genseckey -keystore src/main/resources/keystore.jceks -storetype jceks -storepass $secret -keyalg HMacSHA256 -keysize 2048 -alias HS256 -keypass $secret".execute()
 }
 
+installDist.dependsOn(buildFrontEnd, genKeystore)
 check.dependsOn jacocoTestReport
