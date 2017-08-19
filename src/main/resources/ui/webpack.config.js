@@ -4,8 +4,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const extractCSS = new ExtractTextPlugin('assets/[name].fonts.css');
-const extractSCSS = new ExtractTextPlugin('assets/[name].styles.css');
+const extractCSS = new ExtractTextPlugin('./assets/[name].fonts.css');
+const extractSCSS = new ExtractTextPlugin('./assets/[name].styles.css');
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
 const SRC_DIR = path.resolve(__dirname, 'src');
@@ -19,7 +19,7 @@ module.exports = {
   },
   output: {
     path: BUILD_DIR,
-    filename: 'assets/[name].bundle.js'
+    filename: './assets/[name].bundle.js'
   },
   watch: false,
   devServer: {
@@ -75,7 +75,7 @@ module.exports = {
             // loader: 'url-loader'
             loader: 'file-loader',
             options: {
-              name: 'assets/img/[name].[hash].[ext]'
+              name: './assets/img/[name].[hash].[ext]'
             }
           }
         ]
@@ -84,7 +84,7 @@ module.exports = {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'file-loader',
         options: {
-          name: './fonts/[name].[hash].[ext]'
+          name: '/assets/fonts/[name].[hash].[ext]'
         }
       }]
   },
