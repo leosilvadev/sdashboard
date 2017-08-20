@@ -34,10 +34,10 @@ case class SocketJSHandler(vertx: Vertx, jWTAuth: JWTAuth) extends Handler[SockJ
 
         case Failure(ex) =>
           logger.warn("Not possible to authorize socket access", ex)
-          socket.end(Json.obj(("socket_error", "Access denied")).toBuffer)
+          socket.end(Json.obj(("socket_error", "access_denied")).toBuffer)
       }
     } else {
-      socket.end(Json.obj(("socket_error", "Access denied")).toBuffer)
+      socket.end(Json.obj(("socket_error", "access_denied")).toBuffer)
     }
   }
 

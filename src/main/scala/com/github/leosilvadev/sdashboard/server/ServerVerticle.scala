@@ -20,52 +20,53 @@ case class ServerVerticle() extends ScalaVerticle {
   val logger = Logger(classOf[ServerVerticle])
 
   override def startFuture(): Future[_] = {
-    try {
-      val hasConfigurations = config.fieldNames().containsAll(List("dbName", "dbUrl").asJava)
+    val hasConfigurations = config.fieldNames().containsAll(List("dbName", "dbUrl").asJava)
 
-      if (!hasConfigurations) {
-        return Future.failed(
-          new RuntimeException("Missing configuration, please check. [dbName=required, dbUrl=required]")
-        )
-      }
-
-      val dbName = config.getString("dbName")
-      val dbUrl = config.getString("dbUrl")
-      val bootstrapFilePath = config.getString("bootstrapFilePath")
-
-      var componentsBootstrap = new JsonArray()
-      try {
-        componentsBootstrap = vertx.fileSystem().readFileBlocking(bootstrapFilePath).toJsonArray
-      } catch {
-        case ex => logger.warn("No component loaded from bootstrap file", ex)
-      }
-
-      try {
-        val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
-        DatabaseMigrationRunner(mongoClient).migrate()
-
-        val webClient = WebClient.create(vertx)
-        val modules = Modules(vertx, mongoClient, webClient)
-        val server = vertx.createHttpServer()
-
-        val router = ServerRouter(vertx, modules).route()
-        server.requestHandler(router.accept(_))
-
-        modules.dashboard.builder.build(componentsBootstrap)
-
-        logger.info("# Configuring SDashboard routes...")
-        router.getRoutes().foreach(route => {
-          route.getPath().foreach(logger.info(_))
-        })
-        logger.info("# SDashboard routes configured.")
-        server.listenFuture(8080)
-        Future.successful(server)
-
-      } catch {
-        case ex: Exception => Future.failed(ex)
-
-      }
+    if (!hasConfigurations) {
+      return Future.failed(
+        new RuntimeException("Missing configuration, please check. [dbName=required, dbUrl=required]")
+      )
     }
+
+    val dbName = config.getString("dbName")
+    val dbUrl = config.getString("dbUrl")
+    val bootstrapFilePath = config.getString("bootstrapFilePath")
+
+    try {
+      val mongoClient = MongoClient.createShared(vertx, Json.obj(("db_name", dbName), ("connection_string", dbUrl)))
+      DatabaseMigrationRunner(mongoClient).migrate()
+
+      val webClient = WebClient.create(vertx)
+      val modules = Modules(vertx, mongoClient, webClient)
+      val server = vertx.createHttpServer()
+
+      val router = ServerRouter(vertx, modules).route()
+      server.requestHandler(router.accept(_))
+
+      modules.dashboard.builder.build(loadRuntimeComponents(bootstrapFilePath))
+
+      logger.info("# Configuring SDashboard routes...")
+      router.getRoutes().foreach(route => {
+        route.getPath().foreach(logger.info(_))
+      })
+      logger.info("# SDashboard routes configured.")
+      server.listenFuture(8080)
+      Future.successful(server)
+
+    } catch {
+      case ex: Throwable => Future.failed(ex)
+
+    }
+  }
+
+  def loadRuntimeComponents(bootstrapFilePath: String): JsonArray = {
+    var componentsBootstrap = new JsonArray()
+    try {
+      componentsBootstrap = vertx.fileSystem().readFileBlocking(bootstrapFilePath).toJsonArray
+    } catch {
+      case ex: Throwable => logger.warn("No component loaded from bootstrap file. [{}]", ex.getMessage)
+    }
+    componentsBootstrap
   }
 
 }

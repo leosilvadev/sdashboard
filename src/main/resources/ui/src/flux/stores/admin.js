@@ -3,12 +3,29 @@ import EventEmitter from 'events';
 import dispatcher from '../dispatcher';
 import * as evt from '../events';
 
+const persistUser = user => {
+    localStorage.setItem('sdashboardUser', user);
+}
+
+const restoreUser = () => {
+    try {
+        const admin = JSON.parse(localStorage.getItem('sdashboardUser'));
+        if (admin.token) {
+            return admin;
+        }
+        persistUser(null);
+        return {};
+    } catch(ex) {
+        return {};
+    }
+}
+
 class AdminStore extends EventEmitter {
 
     constructor() {
         super();
 
-        this.admin = {};
+        this.admin = restoreUser();
         this.login = this.login.bind(this);
         this.action = this.action.bind(this);
         this.getAdmin = this.getAdmin.bind(this);
@@ -18,7 +35,10 @@ class AdminStore extends EventEmitter {
         axios.post('/api/v1/auth', user)
           .then(response => {
             console.log(`Admin ${user.username} authenticated!`);
-            this.admin = Object.assign({}, user, {token: response.data.token});
+            const {username} = user;
+            const {token} = response.data;
+            this.admin = Object.assign({}, {username}, {token});
+            persistUser(JSON.stringify(this.admin));
             this.emit('adminAuthenticated');
           })
           .catch(error => {
@@ -28,6 +48,7 @@ class AdminStore extends EventEmitter {
 
     logout() {
         this.admin = {};
+        persistUser(null);
         this.emit('adminLoggedOut');
     }
 

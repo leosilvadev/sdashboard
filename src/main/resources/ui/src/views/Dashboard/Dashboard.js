@@ -23,6 +23,8 @@ import {
   Table
 } from "reactstrap";
 
+import adminStore from '../../flux/stores/admin';
+
 const brandPrimary = '#20a8d8';
 const brandSuccess = '#4dbd74';
 const brandInfo = '#63c2de';
@@ -293,10 +295,23 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false
     };
+    this.toggle = this.toggle.bind(this);
+    this.goToIndex = this.goToIndex.bind(this);
+  }
+
+  componentDidMount() {
+    const token = adminStore.getAdmin().token;
+    if (!token) {
+        this.goToIndex();
+        return;
+    }
+  }
+
+  goToIndex() {
+    return this.props.history.push('/login');
   }
 
   toggle() {

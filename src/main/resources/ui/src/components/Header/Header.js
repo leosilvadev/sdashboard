@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
+import { withRouter } from 'react-router-dom';
 import adminStore from '../../flux/stores/admin';
+import {logout} from '../../flux/actions/admin';
 
 import {
   Badge,
@@ -19,11 +21,33 @@ class Header extends Component {
   constructor(props) {
     super(props);
 
+    this.goToIndex = this.goToIndex.bind(this);
     this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false,
       admin: adminStore.getAdmin()
     };
+  }
+
+  componentDidMount() {
+    const token = adminStore.getAdmin().token;
+    if (!token) {
+        this.goToIndex();
+        return;
+    }
+    adminStore.on('adminLoggedOut', this.goToIndex);
+  }
+
+  componentWillUnmount() {
+    adminStore.removeListener('adminLoggedOut', this.goToIndex);
+  }
+
+  goToIndex() {
+    return this.props.history.push('/login');
+  }
+
+  doLogout() {
+     logout();
   }
 
   toggle() {
@@ -82,7 +106,7 @@ class Header extends Component {
                 <span className="d-md-down-none">{adminStore.getAdmin().username}</span>
               </DropdownToggle>
               <DropdownMenu right className={this.state.dropdownOpen ? 'show' : ''}>
-                <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
+                <DropdownItem onClick={this.doLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </NavItem>
@@ -92,4 +116,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default withRouter(Header);

@@ -16,14 +16,13 @@ class Components extends React.Component {
             components: componentsStore.getComponents()
         }
         this.render = this.render.bind(this);
-        this.updateComponents = this.updateComponents.bind(this);
         this.goToIndex = this.goToIndex.bind(this);
+        this.updateComponents = this.updateComponents.bind(this);
     }
 
     componentWillUnmount() {
         this.socket.stop();
         componentsStore.removeListener('componentsUpdated', this.updateComponents);
-        adminStore.removeListener('adminLoggedOut', this.goToIndex);
     }
 
     componentDidMount() {
@@ -32,18 +31,16 @@ class Components extends React.Component {
             this.goToIndex();
             return;
         }
-
         this.socket.start(token);
         componentsStore.on('componentsUpdated', this.updateComponents);
-        adminStore.on('adminLoggedOut', this.goToIndex);
-    }
-
-    updateComponents() {
-        return this.setState({components: componentsStore.getComponents()});
     }
 
     goToIndex() {
         return this.props.history.push('/login');
+    }
+
+    updateComponents() {
+        return this.setState({components: componentsStore.getComponents()});
     }
 
     load(components) {
