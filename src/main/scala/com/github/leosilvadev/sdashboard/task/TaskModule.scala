@@ -7,8 +7,8 @@ import io.vertx.scala.ext.web.client.WebClient
 /**
   * Created by leonardo on 7/29/17.
   */
-case class TaskModule(vertx: Vertx, client: WebClient) {
+case class TaskModule(client: WebClient)(implicit vertx: Vertx) {
 
-  lazy val executor = TaskExecutor(vertx, client)
+  lazy val executor = TaskExecutor(client)
 
 }

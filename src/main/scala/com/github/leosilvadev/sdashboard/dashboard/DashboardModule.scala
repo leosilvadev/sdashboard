@@ -9,12 +9,12 @@ import io.vertx.scala.core.Vertx
 /**
   * Created by leonardo on 7/29/17.
   */
-case class DashboardModule(vertx: Vertx, componentModule: ComponentModule, authModule: AuthModule) {
+case class DashboardModule(componentModule: ComponentModule, authModule: AuthModule)(implicit vertx: Vertx) {
 
-  lazy val builder = DashboardBuilder(vertx, componentModule.repository, componentModule.checker)
+  lazy val builder = DashboardBuilder(componentModule.repository, componentModule.checker)
 
-  lazy val wsHandler = WSHandler(vertx, authModule.jWTAuth)
+  lazy val wsHandler = WSHandler(authModule.jWTAuth)
 
-  lazy val router = DashboardRouter(vertx, wsHandler)
+  lazy val router = DashboardRouter(wsHandler)
 
 }

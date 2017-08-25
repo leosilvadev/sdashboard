@@ -10,12 +10,20 @@ All the current variables used runtime are:
 - DB_URL (mongodb://username:password@host:port)
 
 ```
-docker build --build-arg secret=sdasbhoardSecret -t sdashbard:0.0.1 .
+docker build \
+    --build-arg secret=sdasbhoardSecret \
+    --build-arg adminEmail=admin \
+    --build-arg adminPass=admin \
+    -t sdashbard:0.0.1 .
 ```
 
 then run:
 ```
-docker run -p 80:8080 -e JWT_SECRET=sdasbhoard -e DB_NAME=sdashboard -e DB_URL=mongodb://username:password@host:port sdashboard:0.0.1
+docker run -p 80:8080 \
+    -e JWT_SECRET=sdasbhoard \
+    -e DB_NAME=sdashboard \
+    -e DB_URL=mongodb://username:password@host:port \
+    sdashboard:0.0.1
 ```
 
 ## Dashboard bootstrap file

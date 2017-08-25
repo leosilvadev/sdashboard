@@ -20,6 +20,7 @@ case class ServerVerticle() extends ScalaVerticle {
   val logger = Logger(classOf[ServerVerticle])
 
   override def startFuture(): Future[_] = {
+    implicit val _vertx = vertx
     val hasConfigurations = config.fieldNames().containsAll(List("dbName", "dbUrl").asJava)
 
     if (!hasConfigurations) {
@@ -37,7 +38,7 @@ case class ServerVerticle() extends ScalaVerticle {
       DatabaseMigrationRunner(mongoClient).migrate()
 
       val webClient = WebClient.create(vertx)
-      val modules = Modules(vertx, mongoClient, webClient)
+      val modules = Modules(mongoClient, webClient)
       val server = vertx.createHttpServer()
 
       val router = ServerRouter(vertx, modules).route()

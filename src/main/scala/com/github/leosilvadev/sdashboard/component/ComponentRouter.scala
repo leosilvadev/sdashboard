@@ -8,10 +8,9 @@ import io.vertx.scala.ext.web.handler.BodyHandler
 /**
   * Created by leonardo on 7/29/17.
   */
-case class ComponentRouter(vertx: Vertx,
-                           componentListHandler: ComponentListHandler,
+case class ComponentRouter(componentListHandler: ComponentListHandler,
                            componentRegisterHandler: ComponentRegisterHandler,
-                           componentUnregisterHandler: ComponentUnregisterHandler) {
+                           componentUnregisterHandler: ComponentUnregisterHandler)(implicit vertx: Vertx) {
 
   def routeV1(): Router = {
     val router = Router.router(vertx)

@@ -11,11 +11,11 @@ import io.vertx.scala.ext.web.client.WebClient
 /**
   * Created by leonardo on 7/29/17.
   */
-case class Modules(vertx: Vertx, mongoClient: MongoClient, webClient: WebClient) {
+case class Modules(mongoClient: MongoClient, webClient: WebClient)(implicit vertx: Vertx) {
 
-  lazy val auth = AuthModule(vertx, mongoClient)
-  lazy val task = TaskModule(vertx, webClient)
-  lazy val component = ComponentModule(vertx, mongoClient, task)
-  lazy val dashboard = DashboardModule(vertx, component, auth)
+  lazy val auth = AuthModule(mongoClient)
+  lazy val task = TaskModule(webClient)
+  lazy val component = ComponentModule(mongoClient, task)
+  lazy val dashboard = DashboardModule(component, auth)
 
 }

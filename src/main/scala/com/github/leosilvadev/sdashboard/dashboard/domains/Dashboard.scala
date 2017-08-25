@@ -13,7 +13,7 @@ import io.vertx.scala.core.Vertx
 /**
   * Created by leonardo on 7/16/17.
   */
-case class Dashboard(vertx: Vertx, componentChecker: ComponentChecker) {
+case class Dashboard(componentChecker: ComponentChecker)(implicit vertx: Vertx) {
 
   val logger = Logger(classOf[Dashboard])
   val components = new ConcurrentHashMap[String, Disposable]()

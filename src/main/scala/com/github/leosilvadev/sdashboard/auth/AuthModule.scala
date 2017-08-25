@@ -2,6 +2,7 @@ package com.github.leosilvadev.sdashboard.auth
 
 import com.github.leosilvadev.sdashboard.auth.handlers.AdminAuthenticationHandler
 import com.github.leosilvadev.sdashboard.auth.middlewares.AuthorizationMiddleware
+import com.github.leosilvadev.sdashboard.auth.util.AdminMigrationRunner
 import io.vertx.lang.scala.json.Json
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.ext.auth.jwt.JWTAuth
@@ -11,11 +12,11 @@ import io.vertx.scala.ext.mongo.MongoClient
 /**
   * Created by leonardo on 7/30/17.
   */
-case class AuthModule(vertx: Vertx, mongoClient: MongoClient) {
+case class AuthModule(mongoClient: MongoClient)(implicit vertx: Vertx) {
 
-  lazy val authProvider = MongoAuth.create(mongoClient, Json.obj(("collectionName", "Admins")))
+  lazy val authProvider: MongoAuth = MongoAuth.create(mongoClient, Json.obj(("collectionName", "Admins")))
 
-  lazy val jWTAuth = JWTAuth.create(vertx,
+  lazy val jWTAuth: JWTAuth = JWTAuth.create(vertx,
     Json.obj(
       ("keyStore", Json.obj(
         ("path", "keystore.jceks"),
@@ -25,9 +26,11 @@ case class AuthModule(vertx: Vertx, mongoClient: MongoClient) {
     )
   )
 
-  lazy val adminAuthenticationHandler = AdminAuthenticationHandler(vertx, authProvider, jWTAuth)
-  lazy val authorizationMiddleware = AuthorizationMiddleware(vertx, jWTAuth)
+  lazy val adminAuthenticationHandler = AdminAuthenticationHandler(authProvider, jWTAuth)
+  lazy val authorizationMiddleware = AuthorizationMiddleware(jWTAuth)
 
-  lazy val router = AuthRouter(vertx, adminAuthenticationHandler)
+  lazy val router = AuthRouter(adminAuthenticationHandler)
 
+  AdminMigrationRunner(authProvider).migrate()
+  
 }

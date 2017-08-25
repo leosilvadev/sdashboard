@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 /**
   * Created by leonardo on 7/18/17.
   */
-case class ComponentRepository(vertx: Vertx, client: MongoClient) {
+case class ComponentRepository(client: MongoClient)(implicit vertx: Vertx) {
 
   protected implicit val executionContext = VertxExecutionContext(vertx.getOrCreateContext())
 

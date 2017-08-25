@@ -38,6 +38,12 @@ COPY gradle gradle
 ARG secret
 ENV JWT_SECRET ${secret}
 
+ARG adminEmail
+ENV ADMIN_EMAIL ${adminEmail}
+
+ARG adminPass
+ENV ADMIN_PASS ${adminPass}
+
 RUN ./gradlew installDist
 
 ENTRYPOINT ./build/install/sdashboard/bin/sdashboard

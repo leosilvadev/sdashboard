@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 /**
   * Created by leonardo on 8/5/17.
   */
-case class AdminAuthenticationHandler(vertx: Vertx, authProvider: AuthProvider, jWTAuth: JWTAuth) extends Handler[RoutingContext] {
+case class AdminAuthenticationHandler(authProvider: AuthProvider, jWTAuth: JWTAuth)(implicit vertx: Vertx) extends Handler[RoutingContext] {
 
   protected implicit val executionContext = VertxExecutionContext(vertx.getOrCreateContext())
 

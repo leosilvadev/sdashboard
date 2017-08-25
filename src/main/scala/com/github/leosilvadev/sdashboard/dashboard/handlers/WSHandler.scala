@@ -9,9 +9,9 @@ import io.vertx.scala.ext.web.handler.sockjs.{SockJSHandler, SockJSHandlerOption
 /**
   * Created by leonardo on 7/29/17.
   */
-case class WSHandler(vertx: Vertx, jWTAuth: JWTAuth) {
+case class WSHandler(jWTAuth: JWTAuth) {
 
-  def sockJsHandler(): Handler[RoutingContext] = {
+  def sockJsHandler()(implicit vertx: Vertx): Handler[RoutingContext] = {
     val options = SockJSHandlerOptions().setHeartbeatInterval(2000)
     val handler = SockJSHandler.create(vertx, options)
     handler.socketHandler(SocketJSHandler(vertx, jWTAuth))

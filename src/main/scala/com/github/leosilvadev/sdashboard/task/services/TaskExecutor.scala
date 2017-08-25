@@ -9,7 +9,7 @@ import io.vertx.scala.ext.web.client.WebClient
 /**
   * Created by leonardo on 7/29/17.
   */
-case class TaskExecutor(vertx: Vertx, client: WebClient) {
+case class TaskExecutor(client: WebClient)(implicit vertx: Vertx) {
 
   def execute(task: Task): Observable[Status] = {
     Observable.create[Status](emitter => {

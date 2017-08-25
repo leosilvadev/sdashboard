@@ -8,8 +8,7 @@ import io.vertx.scala.ext.web.handler.BodyHandler
 /**
   * Created by leonardo on 8/5/17.
   */
-case class AuthRouter(vertx: Vertx,
-                      adminAuthenticationHandler: AdminAuthenticationHandler) {
+case class AuthRouter(adminAuthenticationHandler: AdminAuthenticationHandler)(implicit vertx: Vertx) {
 
   def routeV1(): Router = {
     val router = Router.router(vertx)

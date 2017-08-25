@@ -7,7 +7,7 @@ import io.vertx.scala.ext.web.Router
 /**
   * Created by leonardo on 7/29/17.
   */
-case class DashboardRouter(vertx: Vertx, wsHandler: WSHandler) {
+case class DashboardRouter(wsHandler: WSHandler)(implicit vertx: Vertx) {
 
   def routeV1(): Router = {
     val router = Router.router(vertx)

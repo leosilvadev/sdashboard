@@ -9,17 +9,18 @@ import io.vertx.scala.ext.mongo.MongoClient
 /**
   * Created by leonardo on 7/29/17.
   */
-case class ComponentModule(vertx: Vertx, client: MongoClient, taskModule: TaskModule) {
+case class ComponentModule(client: MongoClient, taskModule: TaskModule)(implicit vertx: Vertx) {
 
-  lazy val repository = ComponentRepository(vertx, client)
+  lazy val repository = ComponentRepository(client)
   lazy val checker = ComponentChecker(taskModule.executor)
 
   lazy val listHandler = ComponentListHandler(repository)
   lazy val registerHandler = ComponentRegisterHandler(repository)
   lazy val unregisterHandler = ComponentUnregisterHandler(repository)
 
-  lazy val router = ComponentRouter(vertx, listHandler, registerHandler, unregisterHandler)
+  lazy val router = ComponentRouter(listHandler, registerHandler, unregisterHandler)
 
-  ComponentStatusUpdater(vertx, repository)
+  lazy val componentStatusUpdater = ComponentStatusUpdater(repository)
+  componentStatusUpdater.start()
 
 }

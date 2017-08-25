@@ -11,12 +11,12 @@ import io.vertx.scala.core.eventbus.Message
 /**
   * Created by leonardo on 7/29/17.
   */
-case class DashboardBuilder(vertx: Vertx, componentRepository: ComponentRepository, componentChecker: ComponentChecker) {
+case class DashboardBuilder(componentRepository: ComponentRepository, componentChecker: ComponentChecker) {
 
   val logger = Logger(classOf[DashboardBuilder])
 
-  def build(componentsBootstrap: JsonArray): Dashboard = {
-    val dashboard = Dashboard(vertx, componentChecker)
+  def build(componentsBootstrap: JsonArray)(implicit vertx: Vertx): Dashboard = {
+    val dashboard = Dashboard(componentChecker)
 
     componentsBootstrap.forEach(json => {
       dashboard.register(Component(json.asInstanceOf[JsonObject]))
