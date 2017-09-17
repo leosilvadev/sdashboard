@@ -10,16 +10,16 @@ import scala.collection.mutable
 /**
   * Created by leonardo on 7/9/17.
   */
-case class Component(id: String, name: String, tasks: List[Task] = List.empty, status: Status = Status.Active()) {
+case class Component(id: String, name: String, dashboardId: String, tasks: List[Task] = List.empty, status: Status = Status.Active()) {
 
-  def addTask(json: JsonObject): Component = Component(id, name, HttpTask(this, json) :: tasks, status)
+  def addTask(json: JsonObject): Component = Component(id, name, dashboardId, HttpTask(this, json) :: tasks, status)
 
   def withId(id: String): Component = {
-    Component(id, name, tasks, status)
+    Component(id, name, dashboardId, tasks, status)
   }
 
   def toJson: JsonObject = {
-    Json.obj(("_id", id), ("name", name), ("tasks", tasks.map(_.toJson)))
+    Json.obj(("_id", id), ("name", name), ("dashboardId", dashboardId), ("tasks", tasks.map(_.toJson)))
   }
 
   def invalid: List[String] = {
@@ -39,7 +39,7 @@ case class Component(id: String, name: String, tasks: List[Task] = List.empty, s
 object Component {
 
   def apply(json: JsonObject): Component = {
-    var component = Component(json.getString("_id", UUID.randomUUID().toString), json.getString("name"))
+    var component = Component(json.getString("_id", UUID.randomUUID().toString), json.getString("name"), json.getString("dashboardId"))
     val tasksJson = json.getJsonArray("tasks", Json.emptyArr())
     tasksJson.forEach(json => {
       component = component.addTask(json.asInstanceOf[JsonObject])
@@ -47,6 +47,6 @@ object Component {
     component
   }
 
-  def apply(id: String, name: String): Component = new Component(id, name)
+  def apply(id: String, name: String, dashboardId: String): Component = new Component(id, name, dashboardId)
 
 }

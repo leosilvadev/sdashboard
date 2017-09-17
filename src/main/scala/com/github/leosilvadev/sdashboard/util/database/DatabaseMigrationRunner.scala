@@ -10,8 +10,9 @@ case class DatabaseMigrationRunner(client: MongoClient) {
 
   def migrate(): Unit = {
     val options = IndexOptions.fromJson(Json.obj(("unique", true)))
-    client.createIndexWithOptions("Components", Json.obj(("name", 1)), options, result => {})
     client.createIndexWithOptions("Admins", Json.obj(("username", 1)), options, result => {})
+    client.createIndexWithOptions("Components", Json.obj(("name", 1)), options, result => {})
+    client.createIndexWithOptions("Dashboards", Json.obj(("name", 1)), options, result => {})
   }
 
 }

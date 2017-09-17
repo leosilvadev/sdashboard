@@ -1,5 +1,6 @@
 package com.github.leosilvadev.sdashboard.component.service
 
+import com.github.leosilvadev.sdashboard.Events
 import com.github.leosilvadev.sdashboard.component.domains.{ComponentSnapshot, Status}
 import io.vertx.lang.scala.json.JsonObject
 import io.vertx.scala.core.Vertx
@@ -10,20 +11,22 @@ import scala.collection.mutable
 /**
   * Created by leonardo on 8/12/17.
   */
-case class ComponentStatusUpdater(repository: ComponentRepository)(implicit vertx: Vertx) {
+case class ComponentStatusUpdater(repository: ComponentStatusRepository)(implicit vertx: Vertx) {
 
-  val consumers: mutable.MutableList[MessageConsumer[JsonObject]] = mutable.MutableList.empty
+  private val consumers: mutable.MutableList[MessageConsumer[JsonObject]] = mutable.MutableList.empty
 
   def start(): Unit = {
-    consumers += vertx.eventBus().consumer("components.status", (message: Message[JsonObject]) => {
-      Status.of(message.body()).foreach(status => {
-        ComponentSnapshot(status).foreach(repository.createSnapshot)
-      })
-    })
+    consumers += vertx.eventBus().consumer(Events.component.checkSuceeded, persist)
+    consumers += vertx.eventBus().consumer(Events.component.checkFailed, persist)
   }
 
   def stop(): Unit = {
     consumers.foreach(_.unregister)
   }
 
+  private def persist(message: Message[JsonObject]): Unit = {
+    Status.of(message.body()).foreach(status => {
+      ComponentSnapshot(status).foreach(repository.createSnapshot)
+    })
+  }
 }

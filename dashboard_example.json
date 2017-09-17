@@ -1,14 +1,32 @@
 [
   {
-    "name": "app2",
-    "tasks": [
+    "name": "dashboard 1",
+    "components": [
       {
-        "type": "http",
-        "frequency": 2000,
-        "url": "http://localhost:8000/status",
-        "headers": {
-          "Authorization": "q1w2e3"
-        }
+        "name": "app1",
+        "tasks": [
+          {
+            "type": "http",
+            "frequency": 2000,
+            "url": "http://localhost:8000/status",
+            "headers": {
+              "Authorization": "q1w2e3"
+            }
+          }
+        ]
+      },
+      {
+        "name": "app2",
+        "tasks": [
+          {
+            "type": "http",
+            "frequency": 2000,
+            "url": "http://localhost:8000/status",
+            "headers": {
+              "Authorization": "q1w2e3"
+            }
+          }
+        ]
       }
     ]
   }

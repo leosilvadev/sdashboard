@@ -19,6 +19,10 @@ case class Response(context: RoutingContext) {
     respond(201, json)
   }
 
+  def accepted(json: JsonObject = Json.emptyObj()): Unit = {
+    respond(202, json)
+  }
+
   def noContent(): Unit = {
     respond(204)
   }

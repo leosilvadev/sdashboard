@@ -21,7 +21,7 @@ object Application extends App {
   val config = Json.obj(
     ("dbName", System.getenv("DB_NAME")),
     ("dbUrl", System.getenv("DB_URL")),
-    ("bootstrapFilePath", System.getenv().getOrDefault("BOOTSTRAP_FILE_PATH", "dashboard.json"))
+    ("bootstrapFilePath", System.getenv().getOrDefault("BOOTSTRAP_FILE_PATH", "dashboard_example.json"))
   )
   val options = DeploymentOptions().setConfig(config)
 

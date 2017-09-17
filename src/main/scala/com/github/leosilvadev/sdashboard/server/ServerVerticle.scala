@@ -44,7 +44,8 @@ case class ServerVerticle() extends ScalaVerticle {
       val router = ServerRouter(vertx, modules).route()
       server.requestHandler(router.accept(_))
 
-      modules.dashboard.builder.build(loadRuntimeComponents(bootstrapFilePath))
+      val dashboards = modules.dashboard.builder.build(loadRuntimeComponents(bootstrapFilePath))
+      dashboards.foreach(modules.dashboard.dashboardRepository.registerIfNotExist(_).subscribe())
 
       logger.info("# Configuring SDashboard routes...")
       router.getRoutes().foreach(route => {

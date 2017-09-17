@@ -1,46 +1,52 @@
 package com.github.leosilvadev.sdashboard.dashboard.domains
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util.UUID
 
-import com.github.leosilvadev.sdashboard.component.domains.Status.Offline
-import com.github.leosilvadev.sdashboard.component.domains.{Component, Status}
-import com.github.leosilvadev.sdashboard.component.service.ComponentChecker
-import com.github.leosilvadev.sdashboard.task.exceptions.ResponseException
+import com.github.leosilvadev.sdashboard.component.domains.Component
 import com.typesafe.scalalogging.Logger
-import io.reactivex.disposables.Disposable
+import io.vertx.core.json.JsonArray
+import io.vertx.lang.scala.json.{Json, JsonObject}
 import io.vertx.scala.core.Vertx
+
+import scala.collection.mutable
 
 /**
   * Created by leonardo on 7/16/17.
   */
-case class Dashboard(componentChecker: ComponentChecker)(implicit vertx: Vertx) {
+case class Dashboard(id: String, name: String, components: List[Component]) {
 
   val logger = Logger(classOf[Dashboard])
-  val components = new ConcurrentHashMap[String, Disposable]()
 
-  def reloadComponents(newComponents: List[Component]): Unit = {
-    components.clear()
-    newComponents.foreach(register)
-    logger.info("Components reloaded: {}", newComponents)
+  def addComponent(component: Component): Dashboard = {
+    Dashboard(id, name, component :: components)
   }
 
-  def register(component: Component): Unit = {
-    val obs = componentChecker.start(component)
-    val disposable = obs.subscribe(publish(_), publishOffline(component, _))
-    components.put(component.id, disposable)
+  def removeComponent(id: String): Dashboard = {
+    Dashboard(id, name, components.filterNot(component => id.eq(component.id)))
   }
 
-  def unregister(id: String): Unit = {
-    if (!components.containsKey(id)) {
-      return
+  def toJson: JsonObject = {
+    Json.obj(
+      ("name", name),
+      ("components", components.map(_.toJson))
+    )
+  }
+
+}
+
+case object Dashboard {
+
+  def apply(json: JsonObject)(implicit vertx: Vertx): Dashboard = {
+    val name = json.getString("name", "")
+    val componentsJson = json.getJsonArray("components", new JsonArray())
+
+    if (name.isEmpty || componentsJson.isEmpty) {
+      throw new RuntimeException("Invalid dashboard data")
     }
 
-    components.get(id).dispose()
-    components.remove(id)
+    val buffer = mutable.Buffer[Component]()
+    componentsJson.forEach(item => buffer += Component(item.asInstanceOf[JsonObject]))
+    Dashboard(UUID.randomUUID().toString, name, buffer.toList)
   }
-
-  def publishOffline(component: Component, ex: Throwable): Unit = publish(Offline(component, ResponseException(ex)))
-
-  def publish(status: Status): Unit = vertx.eventBus().publish("components.status", status.toJson)
 
 }
