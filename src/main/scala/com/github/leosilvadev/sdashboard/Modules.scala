@@ -16,6 +16,6 @@ case class Modules(mongoClient: MongoClient, webClient: WebClient)(implicit vert
   lazy val auth = AuthModule(mongoClient)
   lazy val task = TaskModule(webClient)
   lazy val component = ComponentModule(mongoClient, task)
-  lazy val dashboard = DashboardModule(mongoClient, component, auth)
+  lazy val dashboard = DashboardModule(mongoClient, auth)
 
 }

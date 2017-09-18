@@ -1,6 +1,5 @@
 package com.github.leosilvadev.sdashboard.dashboard
 
-import com.github.leosilvadev.sdashboard.component.service.ComponentChecker
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
 import com.github.leosilvadev.sdashboard.dashboard.handlers.WSHandler
 import com.github.leosilvadev.sdashboard.dashboard.services.DashboardRepository
@@ -13,7 +12,7 @@ import io.vertx.scala.ext.web.handler.BodyHandler
 /**
   * Created by leonardo on 7/29/17.
   */
-case class DashboardRouter(wsHandler: WSHandler, dashboardRepository: DashboardRepository, componentChecker: ComponentChecker)(implicit vertx: Vertx) {
+case class DashboardRouter(wsHandler: WSHandler, dashboardRepository: DashboardRepository)(implicit vertx: Vertx) {
 
   def routeWebsocketV1(): Router = {
     val router = Router.router(vertx)

@@ -17,6 +17,10 @@ case class Dashboard(id: String, name: String, components: List[Component]) {
 
   val logger = Logger(classOf[Dashboard])
 
+  def withId(id: String): Dashboard = {
+    Dashboard(id, name, components.map(_.withDashboardId(id)))
+  }
+
   def addComponent(component: Component): Dashboard = {
     Dashboard(id, name, component :: components)
   }
@@ -27,6 +31,7 @@ case class Dashboard(id: String, name: String, components: List[Component]) {
 
   def toJson: JsonObject = {
     Json.obj(
+      ("_id", id),
       ("name", name),
       ("components", components.map(_.toJson))
     )
@@ -37,6 +42,7 @@ case class Dashboard(id: String, name: String, components: List[Component]) {
 case object Dashboard {
 
   def apply(json: JsonObject)(implicit vertx: Vertx): Dashboard = {
+    val id = json.getString("_id", UUID.randomUUID().toString)
     val name = json.getString("name", "")
     val componentsJson = json.getJsonArray("components", new JsonArray())
 
@@ -45,8 +51,10 @@ case object Dashboard {
     }
 
     val buffer = mutable.Buffer[Component]()
-    componentsJson.forEach(item => buffer += Component(item.asInstanceOf[JsonObject]))
-    Dashboard(UUID.randomUUID().toString, name, buffer.toList)
+    componentsJson.forEach(item => {
+      buffer += Component(item.asInstanceOf[JsonObject])
+    })
+    Dashboard(id, name, buffer.toList)
   }
 
 }

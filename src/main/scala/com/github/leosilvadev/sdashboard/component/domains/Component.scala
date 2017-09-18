@@ -18,6 +18,10 @@ case class Component(id: String, name: String, dashboardId: String, tasks: List[
     Component(id, name, dashboardId, tasks, status)
   }
 
+  def withDashboardId(dashboardId: String): Component = {
+    Component(id, name, dashboardId, tasks, status)
+  }
+
   def toJson: JsonObject = {
     Json.obj(("_id", id), ("name", name), ("dashboardId", dashboardId), ("tasks", tasks.map(_.toJson)))
   }
@@ -27,6 +31,9 @@ case class Component(id: String, name: String, dashboardId: String, tasks: List[
 
     if (name.isEmpty)
       fields += "name"
+
+    if (dashboardId.isEmpty)
+      fields += "dashboardId"
 
     if (tasks.isEmpty)
       fields += "tasks"

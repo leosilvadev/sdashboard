@@ -19,7 +19,7 @@ case class DashboardEventListener(dashboardRepository: DashboardRepository)(impl
     vertx.eventBus().consumer(Events.component.newOne, (message: Message[JsonObject]) => {
       val component = Component(message.body())
       dashboardRepository.findOneById(component.dashboardId)
-        .map(_.addComponent(component))
+        .map[Dashboard](_.addComponent(component))
         .flatMap[Dashboard](dashboardRepository.update)
         .subscribe(
           dashboard => vertx.eventBus().publish(Events.component.registrationSucceeded, dashboard.toJson),

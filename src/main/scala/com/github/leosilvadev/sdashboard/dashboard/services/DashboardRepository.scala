@@ -33,20 +33,21 @@ case class DashboardRepository(client: MongoClient)(implicit vertx: Vertx) {
 
   def update(dashboard: Dashboard): Single[Dashboard] = {
     Single.create(emitter => {
-      client.updateFuture(collection, Json.obj(("id", dashboard.id)), dashboard.toJson).onComplete {
+      val json = dashboard.toJson
+      client.updateFuture(collection, Json.obj(("_id", dashboard.id)), Json.obj(("$set", json))).onComplete {
         case Success(_) => emitter.onSuccess(dashboard)
         case Failure(ex) => emitter.onError(ex)
       }
     })
   }
 
-  def registerIfNotExist(dashboard: Dashboard): Single[Dashboard] = {
-    findOneByName(dashboard.name)
-        .flatMap(_ => update(dashboard))
+  def registerIfNotExist(newDashboard: Dashboard): Single[Dashboard] = {
+    findOneByName(newDashboard.name)
+        .flatMap[Dashboard](dashboard => update(newDashboard.withId(dashboard.id)))
         .doOnError(error => {
           logger.error(error.getMessage, error)
         })
-        .onErrorResumeNext(register(dashboard))
+        .onErrorResumeNext(register(newDashboard))
   }
 
   def findOneByName(name: String): Single[Dashboard] = {
@@ -60,9 +61,15 @@ case class DashboardRepository(client: MongoClient)(implicit vertx: Vertx) {
   def findOneBy(field: String, value: String): Single[Dashboard] = {
     Single.create(emitter => {
       client.findOneFuture(collection, Json.obj((field, value)), Json.emptyObj()).onComplete {
-        case Success(json) if null != json => emitter.onSuccess(Dashboard(json))
-        case Success(_) => emitter.onError(new RuntimeException("Invalid dashboard"))
-        case Failure(ex) => emitter.onError(ex)
+        case Success(json) if null != json => {
+          emitter.onSuccess(Dashboard(json))
+        }
+        case Success(_) => {
+          emitter.onError(new RuntimeException("Invalid dashboard"))
+        }
+        case Failure(ex) => {
+          emitter.onError(ex)
+        }
       }
     })
   }
