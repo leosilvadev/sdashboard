@@ -1,5 +1,6 @@
 package com.github.leosilvadev.sdashboard.dashboard.handlers
 
+import com.github.leosilvadev.sdashboard.Events
 import com.typesafe.scalalogging.Logger
 import io.vertx.core.Handler
 import io.vertx.lang.scala.VertxExecutionContext
@@ -27,8 +28,14 @@ case class SocketJSHandler(vertx: Vertx, jWTAuth: JWTAuth) extends Handler[SockJ
       jWTAuth.authenticateFuture(Json.obj(("jwt", token))).onComplete {
         case Success(_) =>
           logger.info("New client connected, {}", socket.writeHandlerID())
-          vertx.eventBus().consumer("components.status", (message: Message[JsonObject]) => {
+          vertx.eventBus().consumer(Events.component.checkSuceeded, (message: Message[JsonObject]) => {
             val status = message.body()
+            println(s"Success ${status}")
+            socket.write(status.encode())
+          })
+          vertx.eventBus().consumer(Events.component.checkFailed, (message: Message[JsonObject]) => {
+            val status = message.body()
+            println(s"Failed ${status}")
             socket.write(status.encode())
           })
 

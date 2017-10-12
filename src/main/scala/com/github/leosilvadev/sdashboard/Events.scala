@@ -8,6 +8,7 @@ object Events {
 
   object component {
 
+    def check: String = "components.check"
     def newOne: String = "components.new"
     def registrationSucceeded: String = "components.registration.succeeded"
     def registrationFailed: String = "components.registration.failed"

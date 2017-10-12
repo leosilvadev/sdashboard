@@ -1,8 +1,11 @@
 package com.github.leosilvadev.sdashboard.server
 
-import com.github.leosilvadev.sdashboard.Modules
+import com.github.leosilvadev.sdashboard.component.domains.Component
+import com.github.leosilvadev.sdashboard.dashboard.services.DashboardRepository
 import com.github.leosilvadev.sdashboard.util.database.DatabaseMigrationRunner
+import com.github.leosilvadev.sdashboard.{Events, Modules}
 import com.typesafe.scalalogging.Logger
+import io.reactivex.Observable
 import io.vertx.core.json.JsonArray
 import io.vertx.lang.scala.ScalaVerticle
 import io.vertx.lang.scala.json.Json
@@ -47,6 +50,8 @@ case class ServerVerticle() extends ScalaVerticle {
       val dashboards = modules.dashboard.builder.build(loadRuntimeComponents(bootstrapFilePath))
       dashboards.foreach(modules.dashboard.repository.registerIfNotExist(_).subscribe())
 
+      startDelayedExecutionOfCurrentComponent(modules.dashboard.repository)
+
       logger.info("# Configuring SDashboard routes...")
       router.getRoutes().foreach(route => {
         route.getPath().foreach(logger.info(_))
@@ -59,6 +64,18 @@ case class ServerVerticle() extends ScalaVerticle {
       case ex: Throwable => Future.failed(ex)
 
     }
+  }
+
+  def startDelayedExecutionOfCurrentComponent(dashboardRepository: DashboardRepository): Unit = {
+    vertx.setTimer(2000, _ => {
+      dashboardRepository.findAll()
+        .flatMap(dashboard => Observable.fromIterable(dashboard.components.asJava))
+        .doOnNext((component:Component) => {
+          logger.info("Triggering check of component {}", component)
+          vertx.eventBus().send(Events.component.check, component.toJson)
+        })
+        .subscribe()
+    })
   }
 
   def loadRuntimeComponents(bootstrapFilePath: String): JsonArray = {

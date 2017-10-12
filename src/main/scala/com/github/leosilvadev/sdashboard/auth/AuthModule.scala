@@ -14,9 +14,9 @@ import io.vertx.scala.ext.mongo.MongoClient
   */
 case class AuthModule(mongoClient: MongoClient)(implicit vertx: Vertx) {
 
-  lazy val authProvider: MongoAuth = MongoAuth.create(mongoClient, Json.obj(("collectionName", "Admins")))
+  val authProvider: MongoAuth = MongoAuth.create(mongoClient, Json.obj(("collectionName", "Admins")))
 
-  lazy val jWTAuth: JWTAuth = JWTAuth.create(vertx,
+  val jWTAuth: JWTAuth = JWTAuth.create(vertx,
     Json.obj(
       ("keyStore", Json.obj(
         ("path", "keystore.jceks"),
@@ -26,10 +26,10 @@ case class AuthModule(mongoClient: MongoClient)(implicit vertx: Vertx) {
     )
   )
 
-  lazy val adminAuthenticationHandler = AdminAuthenticationHandler(authProvider, jWTAuth)
-  lazy val authorizationMiddleware = AuthorizationMiddleware(jWTAuth)
+  val adminAuthenticationHandler = AdminAuthenticationHandler(authProvider, jWTAuth)
+  val authorizationMiddleware = AuthorizationMiddleware(jWTAuth)
 
-  lazy val router = AuthRouter(adminAuthenticationHandler)
+  val router = AuthRouter(adminAuthenticationHandler)
 
   AdminMigrationRunner(authProvider).migrate()
   

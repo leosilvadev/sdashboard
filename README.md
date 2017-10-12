@@ -23,6 +23,7 @@ docker run -p 80:8080 \
     -e JWT_SECRET=sdasbhoard \
     -e DB_NAME=sdashboard \
     -e DB_URL=mongodb://username:password@host:port \
+    -v $PWD/dashboard_example.json:/app/dashboard.json \
     sdashboard:0.0.1
 ```
 

@@ -11,13 +11,13 @@ import io.vertx.scala.ext.mongo.MongoClient
   */
 case class DashboardModule(mongoClient: MongoClient, authModule: AuthModule)(implicit vertx: Vertx) {
 
-  lazy val repository = DashboardRepository(mongoClient)
+  val repository = DashboardRepository(mongoClient)
 
-  lazy val builder = DashboardBuilder(repository)
+  val builder = DashboardBuilder(repository)
 
-  lazy val wsHandler = WSHandler(authModule.jWTAuth)
+  val wsHandler = WSHandler(authModule.jWTAuth)
 
-  lazy val router = DashboardRouter(wsHandler, repository)
+  val router = DashboardRouter(wsHandler, repository)
 
   DashboardEventListener(repository).start()
 

@@ -22,15 +22,27 @@ case class ComponentChecker(taskExecutor: TaskExecutor)(implicit vertx: Vertx) {
   val logger = Logger(classOf[DashboardRepository])
 
   def start(): Unit = {
+    logger.info("Starting Component checker")
     vertx.eventBus().consumer(Events.component.registrationSucceeded, (message: Message[JsonObject]) => {
-      val component = Component(message.body())
-      merge(component.tasks.map(taskExecutor.execute).asJava).subscribe(
-        result => vertx.eventBus().publish(Events.component.checkSuceeded, result.toJson),
-        error => {
-          logger.warn(error.getMessage, error)
-          vertx.eventBus().publish(Events.component.checkFailed, Offline(component, ResponseException(error)).toJson)
-        })
+      check(Component(message.body()))
     })
+
+    vertx.eventBus().consumer(Events.component.check, (message: Message[JsonObject]) => {
+      check(Component(message.body()))
+    })
+    logger.info("Component checker started, listening to {} and {}", Events.component.registrationSucceeded, Events.component.check)
+  }
+
+  def check(component: Component): Unit = {
+    merge(component.tasks.map(taskExecutor.execute).asJava).subscribe(
+      result => {
+        logger.info("Result of component execution: {}", result)
+        vertx.eventBus().publish(Events.component.checkSuceeded, result.toJson)
+      },
+      error => {
+        logger.warn(error.getMessage, error)
+        vertx.eventBus().publish(Events.component.checkFailed, Offline(component, ResponseException(error)).toJson)
+      })
   }
 
 }

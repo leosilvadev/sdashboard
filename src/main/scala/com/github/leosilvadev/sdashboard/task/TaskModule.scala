@@ -9,6 +9,6 @@ import io.vertx.scala.ext.web.client.WebClient
   */
 case class TaskModule(client: WebClient)(implicit vertx: Vertx) {
 
-  lazy val executor = TaskExecutor(client)
+  val executor = TaskExecutor(client)
 
 }

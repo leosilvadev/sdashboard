@@ -4,7 +4,7 @@ import java.util.function.{Function => JFunction, Predicate => JPredicate}
 
 import com.github.leosilvadev.sdashboard.dashboard.domains.Dashboard
 import com.typesafe.scalalogging.Logger
-import io.reactivex.Single
+import io.reactivex.{Observable, Single}
 import io.vertx.lang.scala.VertxExecutionContext
 import io.vertx.lang.scala.json.Json
 import io.vertx.scala.core.Vertx
@@ -43,11 +43,11 @@ case class DashboardRepository(client: MongoClient)(implicit vertx: Vertx) {
 
   def registerIfNotExist(newDashboard: Dashboard): Single[Dashboard] = {
     findOneByName(newDashboard.name)
-        .flatMap[Dashboard](dashboard => update(newDashboard.withId(dashboard.id)))
-        .doOnError(error => {
-          logger.error(error.getMessage, error)
-        })
-        .onErrorResumeNext(register(newDashboard))
+      .flatMap[Dashboard](dashboard => update(newDashboard.withId(dashboard.id)))
+      .doOnError(error => {
+        logger.error(error.getMessage, error)
+      })
+      .onErrorResumeNext(register(newDashboard))
   }
 
   def findOneByName(name: String): Single[Dashboard] = {
@@ -61,15 +61,27 @@ case class DashboardRepository(client: MongoClient)(implicit vertx: Vertx) {
   def findOneBy(field: String, value: String): Single[Dashboard] = {
     Single.create(emitter => {
       client.findOneFuture(collection, Json.obj((field, value)), Json.emptyObj()).onComplete {
-        case Success(json) if null != json => {
+        case Success(json) if null != json =>
           emitter.onSuccess(Dashboard(json))
-        }
-        case Success(_) => {
+
+        case Success(_) =>
           emitter.onError(new RuntimeException("Invalid dashboard"))
-        }
-        case Failure(ex) => {
+
+        case Failure(ex) =>
           emitter.onError(ex)
-        }
+      }
+    })
+  }
+
+  def findAll(): Observable[Dashboard] = {
+    Observable.create(emitter => {
+      client.findFuture(collection, Json.emptyObj()).onComplete {
+        case Success(json) =>
+          json.map(Dashboard(_)).foreach(emitter.onNext)
+          emitter.onComplete()
+
+        case Failure(ex) =>
+          emitter.onError(ex)
       }
     })
   }
